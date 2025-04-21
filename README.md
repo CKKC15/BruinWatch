@@ -16,6 +16,5 @@ npm run dev
 ```bash
 cd backend
 # install backend dependencies
-
 node app.js
 ```
