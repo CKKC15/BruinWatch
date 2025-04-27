@@ -1,16 +1,25 @@
-import { useState } from 'react'
-import './App.css'
-import VideoInput from './components/VideoInput'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import Login from './components/Login';
+import VideoInput from './components/VideoInput';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Replace with your Google Client ID when you have one
+  const googleClientId = "YOUR_GOOGLE_CLIENT_ID";
 
   return (
-    <div className="App">
-      <h1>Video upload</h1>
-      <VideoInput width={400} height={300} />
-    </div>
-  )
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/video-input" element={<VideoInput />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
+    </GoogleOAuthProvider>
+  );
 }
 
-export default App
+export default App;
