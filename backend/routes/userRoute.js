@@ -1,7 +1,7 @@
 // user route
 
 import express from 'express';
-import { register, login, logout, updateUser, getAllVideos } from '../controllers/userController.js';
+import { register, login, logout, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo } from '../controllers/userController.js';
 import auth from '../middleware/auth.js';
 
 const router = express.Router();
@@ -14,7 +14,11 @@ router.post('/logout', auth, logout);
 // update user
 router.put('/:id', auth, updateUser);
 
-// video funcs
-router.get('/videos', auth, getAllVideos);
+// video funcs nested under user
+router.post('/:id/videos', auth, createVideo);
+router.get('/:id/videos', auth, getAllVideos);
+router.get('/:id/videos/:videoId', auth, getVideoById);
+router.put('/:id/videos/:videoId', auth, updateVideo);
+router.delete('/:id/videos/:videoId', auth, deleteVideo);
 
 export default router;
