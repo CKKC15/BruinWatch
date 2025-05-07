@@ -14,11 +14,13 @@ router.post('/logout', auth, logout);
 // update user
 router.put('/:id', auth, updateUser);
 
-// video funcs nested under user
+// video routes under user
 router.post('/:id/videos', auth, createVideo);
 router.get('/:id/videos', auth, getAllVideos);
 router.get('/:id/videos/:videoId', auth, getVideoById);
 router.put('/:id/videos/:videoId', auth, updateVideo);
 router.delete('/:id/videos/:videoId', auth, deleteVideo);
+
+// video routes moved to videoRoute.js
 
 export default router;

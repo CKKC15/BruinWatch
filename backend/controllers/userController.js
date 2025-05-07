@@ -3,7 +3,13 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
-import Video from '../models/video.js';
+import {
+  createVideoRecord,
+  fetchAllVideos,
+  fetchVideoById,
+  updateVideoRecord,
+  deleteVideoRecord
+} from './videoController.js';
 
 // register and login user
 export const register = async (req, res) => {
@@ -62,32 +68,33 @@ export const updateUser = async (req, res) => {
 // fetch all videos
 export const getAllVideos = async (req, res) => {
   try {
-    const { id } = req.params;
-    const videos = await Video.find({ user: id });
+    const { id: userId } = req.params;
+    const videos = await fetchAllVideos(userId);
     res.json(videos);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// create a new video
+// create a new video and link to user
 export const createVideo = async (req, res) => {
   try {
     const { title, link, transcript } = req.body;
     const { id: userId } = req.params;
     if (!title || !link) return res.status(400).json({ message: 'Missing fields' });
-    const video = await Video.create({ title, link, transcript, user: userId });
+    const video = await createVideoRecord({ title, link, transcript, userId });
+    await User.findByIdAndUpdate(userId, { $push: { videos: video._id } });
     res.status(201).json(video);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// fetch single video by ID
+// fetch single video
 export const getVideoById = async (req, res) => {
   try {
     const { id: userId, videoId } = req.params;
-    const video = await Video.findOne({ _id: videoId, user: userId });
+    const video = await fetchVideoById(userId, videoId);
     if (!video) return res.status(404).json({ message: 'Video not found' });
     res.json(video);
   } catch (err) {
@@ -95,16 +102,12 @@ export const getVideoById = async (req, res) => {
   }
 };
 
-// update video by ID
+// update video
 export const updateVideo = async (req, res) => {
   try {
     const { id: userId, videoId } = req.params;
-    const updated = req.body;
-    const video = await Video.findOneAndUpdate(
-      { _id: videoId, user: userId },
-      updated,
-      { new: true }
-    );
+    const updatedData = req.body;
+    const video = await updateVideoRecord(userId, videoId, updatedData);
     if (!video) return res.status(404).json({ message: 'Video not found' });
     res.json(video);
   } catch (err) {
@@ -112,12 +115,13 @@ export const updateVideo = async (req, res) => {
   }
 };
 
-// delete video by ID
+// delete video and unlink from user
 export const deleteVideo = async (req, res) => {
   try {
     const { id: userId, videoId } = req.params;
-    const video = await Video.findOneAndDelete({ _id: videoId, user: userId });
+    const video = await deleteVideoRecord(userId, videoId);
     if (!video) return res.status(404).json({ message: 'Video not found' });
+    await User.findByIdAndUpdate(userId, { $pull: { videos: videoId } });
     res.json({ message: 'Deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
