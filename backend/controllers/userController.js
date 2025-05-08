@@ -3,13 +3,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
-import {
-  createVideoRecord,
-  fetchAllVideos,
-  fetchVideoById,
-  updateVideoRecord,
-  deleteVideoRecord
-} from './videoController.js';
+import { createVideoRecord, fetchAllVideos, fetchVideoById, updateVideoRecord, deleteVideoRecord } from './videoController.js';
+import { uploadFileToS3 } from '../service/awsUpload.js';
 
 // register and login user
 export const register = async (req, res) => {
@@ -79,10 +74,11 @@ export const getAllVideos = async (req, res) => {
 // create a new video and link to user
 export const createVideo = async (req, res) => {
   try {
-    const { title, link, transcript } = req.body;
+    const { title, transcript } = req.body;
     const { id: userId } = req.params;
-    if (!title || !link) return res.status(400).json({ message: 'Missing fields' });
-    const video = await createVideoRecord({ title, link, transcript, userId });
+    if (!title || !req.file) return res.status(400).json({ message: 'Missing fields' });
+    const s3Url = await uploadFileToS3(req.file, 'videos');
+    const video = await createVideoRecord({ title, link: s3Url, transcript, userId });
     await User.findByIdAndUpdate(userId, { $push: { videos: video._id } });
     res.status(201).json(video);
   } catch (err) {

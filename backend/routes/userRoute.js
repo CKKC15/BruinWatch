@@ -3,6 +3,8 @@
 import express from 'express';
 import { register, login, logout, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo } from '../controllers/userController.js';
 import auth from '../middleware/auth.js';
+import multer from 'multer';
+const upload = multer();
 
 const router = express.Router();
 
@@ -15,7 +17,7 @@ router.post('/logout', auth, logout);
 router.put('/:id', auth, updateUser);
 
 // video routes under user
-router.post('/:id/videos', auth, createVideo);
+router.post('/:id/videos', auth, upload.single('file'), createVideo);
 router.get('/:id/videos', auth, getAllVideos);
 router.get('/:id/videos/:videoId', auth, getVideoById);
 router.put('/:id/videos/:videoId', auth, updateVideo);
