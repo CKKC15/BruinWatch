@@ -6,11 +6,32 @@ export default function VideoPlayer() {
     const Tabs = () => {
         return (
             <div>
-                <div className="bloc-tabs">
-                    <button className="tabs-option">
-                        Hello
-                    </button>
+                <div className="container">
+                    <div className="bloc-tabs">
+                        <button className="tabs-option">Transcript</button>
+                        <button className="tabs-option">Whiteboard</button>
+                        <button className="tabs-option">Chat</button>
+                    </div>
+                    <div className="content-tabs">
+                        <div className="content active-content">
+                            <h2>Transcript</h2>
+                            <hr></hr>
+                            <p>Insert transcript here</p>
+                        </div>
+                        <div className="content active-content">
+                            <h2>Whiteboard</h2>
+                            <hr></hr>
+                            <p>Insert whiteboard here</p>
+                        </div>
+                        <div className="content active-content">
+                            <h2>Chat</h2>
+                            <hr></hr>
+                            <p>Insert chat here</p>
+                        </div>
+                    </div>
                 </div>
+
+
             </div>
         );
 
@@ -30,8 +51,9 @@ export default function VideoPlayer() {
                 </div>
             </div>
 
-            <div className="tab-container">
+            <div className="tab-section">
                 <h1>Here are the tabs</h1>
+                <Tabs />
             </div>
         </div>
 

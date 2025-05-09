@@ -1,5 +1,21 @@
 /* i'll copy this over to index.css later */
 
 .video-page {
-    display: flex
+    display: flex;
+    height: 100vh;
+    background-color: #ffffff;
+}
+
+/* styling for the tabs */
+
+.container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 800px;
+    height: auto;
+    background: #EAE6E0;
+    margin: 100px auto;
+    word-break: break-all;
+
 }
