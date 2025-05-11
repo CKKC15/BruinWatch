@@ -8,7 +8,7 @@ const videoSchema = new mongoose.Schema({
   link: { type: String },
   transcript: { type: String },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  class: { type: mongoose.Schema.Types.ObjectId, ref: 'Class' },
+  className: { type: String },
 }, { timestamps: true });
 
 export default mongoose.model('Video', videoSchema);
