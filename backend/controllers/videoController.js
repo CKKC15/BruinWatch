@@ -1,8 +1,8 @@
 import Video from '../models/video.js';
 
 // Pure video CRUD operations (service layer)
-export const createVideoRecord = async ({ title, link, transcript, userId }) => {
-  return await Video.create({ title, link, transcript, user: userId });
+export const createVideoRecord = async ({ title, link, transcript, userId, className }) => {
+  return await Video.create({ title, link, transcript, user: userId, className });
 };
 
 export const fetchAllVideos = async (userId) => {

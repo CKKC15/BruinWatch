@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String },
   email: { type: String, unique: true },
   password: { type: String },
+  classes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Class' }],
   videos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }]
 }, { timestamps: true });
 
