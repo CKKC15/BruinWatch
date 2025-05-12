@@ -6,7 +6,7 @@ export default function VideoPlayer() {
     const Tabs = () => {
         return (
             <div>
-                <div className="container">
+                <div className="tabs-container">
                     <div className="bloc-tabs">
                         <button className="tabs-option">Transcript</button>
                         <button className="tabs-option">Whiteboard</button>
@@ -31,7 +31,6 @@ export default function VideoPlayer() {
                     </div>
                 </div>
 
-
             </div>
         );
 
@@ -39,9 +38,9 @@ export default function VideoPlayer() {
     }
 
     return (
-        <div>
-            <div className="video-page">
-                <div className="video-section">
+        <div className="page-container">
+            <div className="video-section">
+                <div className="video-container">
                     <ReactPlayer
                         className="react-player"
                         url='https://youtu.be/e_04ZrNroTo?si=RU72z2S5nmrM62t0' //temporary url
@@ -52,7 +51,6 @@ export default function VideoPlayer() {
             </div>
 
             <div className="tab-section">
-                <h1>Here are the tabs</h1>
                 <Tabs />
             </div>
         </div>
