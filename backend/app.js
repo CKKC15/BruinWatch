@@ -1,7 +1,7 @@
 import express from 'express';
 import connectDB from './db/mongo.js';
 import userRoute from './routes/userRoute.js';
-import videoRoute from './routes/videoRoute.js';
+import chatbotRoute from './routes/chatbotRoute.js';
 
 const app = express();
 const port = 5000;
@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 
 // routes
 app.use('/users', userRoute);
-app.use('/videos', videoRoute);
+app.use('/chat', chatbotRoute);
 
 // start server and connect to db
 app.listen(port, async () => {

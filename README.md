@@ -10,6 +10,10 @@ Make sure your `.env` file is in `.gitignore`.
 ```bash
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
+AWS_ACCESS_KEY_ID=your_aws_access_key_id
+AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+AWS_REGION=your_aws_region
+S3_BUCKET=your_s3_bucket_name
 ```
 
 ### Frontend

@@ -3,7 +3,9 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
-import Video from '../models/video.js';
+import { createVideoRecord, fetchAllVideos, fetchVideoById, updateVideoRecord, deleteVideoRecord } from './videoController.js';
+import { uploadFileToS3 } from '../service/awsUpload.js';
+import { createClass, fetchAllClasses, fetchClassById, updateClass, deleteClass } from './classController.js';
 
 // register and login user
 export const register = async (req, res) => {
@@ -62,8 +64,139 @@ export const updateUser = async (req, res) => {
 // fetch all videos
 export const getAllVideos = async (req, res) => {
   try {
-    const videos = await Video.find();
+    const { id: userId } = req.params;
+    const videos = await fetchAllVideos(userId);
     res.json(videos);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// create a new video and link to user
+export const createVideo = async (req, res) => {
+  try {
+    const { title, transcript, className, date } = req.body;
+    const { id: userId } = req.params;
+    if (!title || !req.file) return res.status(400).json({ message: 'Missing fields' });
+    const s3Url = await uploadFileToS3(req.file, 'videos');
+    const video = await createVideoRecord({ title, link: s3Url, transcript, userId, className, date });
+    await User.findByIdAndUpdate(userId, { $push: { videos: video._id } });
+    res.status(201).json(video);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// fetch single video
+export const getVideoById = async (req, res) => {
+  try {
+    const { id: userId, videoId } = req.params;
+    const video = await fetchVideoById(userId, videoId);
+    if (!video) return res.status(404).json({ message: 'Video not found' });
+    res.json(video);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// update video
+export const updateVideo = async (req, res) => {
+  try {
+    const { id: userId, videoId } = req.params;
+    const updatedData = req.body;
+    const video = await updateVideoRecord(userId, videoId, updatedData);
+    if (!video) return res.status(404).json({ message: 'Video not found' });
+    res.json(video);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// delete video and unlink from user
+export const deleteVideo = async (req, res) => {
+  try {
+    const { id: userId, videoId } = req.params;
+    const video = await deleteVideoRecord(userId, videoId);
+    if (!video) return res.status(404).json({ message: 'Video not found' });
+    await User.findByIdAndUpdate(userId, { $pull: { videos: videoId } });
+    res.json({ message: 'Deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// fetch all classes for a user
+export const getAllClasses = async (req, res) => {
+  try {
+    const { id: userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const classes = await fetchAllClasses(user.classes);
+    res.json(classes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// create a new class and link to user
+export const createClass = async (req, res) => {
+  try {
+    const { name, professor, term, color } = req.body;
+    const { id: userId } = req.params;
+    if (!name) return res.status(400).json({ message: 'Missing fields' });
+    const newClass = await createClass({ name, professor, term, color });
+    await User.findByIdAndUpdate(userId, { $push: { classes: newClass.name } });
+    res.status(201).json(newClass);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// fetch a single class
+export const getClassById = async (req, res) => {
+  try {
+    const { id: userId, classId } = req.params;
+    const classObj = await fetchClassById(classId);
+    if (!classObj) return res.status(404).json({ message: 'Class not found' });
+    res.json(classObj);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// update class
+export const updateClass = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const updatedData = req.body;
+    const classObj = await updateClass(classId, updatedData);
+    if (!classObj) return res.status(404).json({ message: 'Class not found' });
+    res.json(classObj);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// delete class and unlink from user
+export const deleteClass = async (req, res) => {
+  try {
+    const { id: userId, classId } = req.params;
+    const classObj = await deleteClass(classId);
+    if (!classObj) return res.status(404).json({ message: 'Class not found' });
+    await User.findByIdAndUpdate(userId, { $pull: { classes: classObj.name } });
+    res.json({ message: 'Deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// fetch all class names for a user
+export const getAllClassNames = async (req, res) => {
+  try {
+    const { id: userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user.classes);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
