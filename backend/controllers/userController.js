@@ -75,11 +75,11 @@ export const getAllVideos = async (req, res) => {
 // create a new video and link to user
 export const createVideo = async (req, res) => {
   try {
-    const { title, transcript, className } = req.body;
+    const { title, transcript, className, date } = req.body;
     const { id: userId } = req.params;
     if (!title || !req.file) return res.status(400).json({ message: 'Missing fields' });
     const s3Url = await uploadFileToS3(req.file, 'videos');
-    const video = await createVideoRecord({ title, link: s3Url, transcript, userId, className });
+    const video = await createVideoRecord({ title, link: s3Url, transcript, userId, className, date });
     await User.findByIdAndUpdate(userId, { $push: { videos: video._id } });
     res.status(201).json(video);
   } catch (err) {
