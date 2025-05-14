@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import { createVideoRecord, fetchAllVideos, fetchVideoById, updateVideoRecord, deleteVideoRecord } from './videoController.js';
 import { uploadFileToS3 } from '../service/awsUpload.js';
-import { createClass, fetchAllClasses, fetchClassById, updateClass, deleteClass } from './classController.js';
+import { createClassRecord, fetchAllClasses, fetchClassById, updateClassRecord, deleteClassRecord } from './classController.js';
 
 // register and login user
 export const register = async (req, res) => {
@@ -144,7 +144,7 @@ export const createClass = async (req, res) => {
     const { name, professor, term, color } = req.body;
     const { id: userId } = req.params;
     if (!name) return res.status(400).json({ message: 'Missing fields' });
-    const newClass = await createClass({ name, professor, term, color });
+    const newClass = await createClassRecord({ name, professor, term, color });
     await User.findByIdAndUpdate(userId, { $push: { classes: newClass.name } });
     res.status(201).json(newClass);
   } catch (err) {
@@ -169,7 +169,7 @@ export const updateClass = async (req, res) => {
   try {
     const { classId } = req.params;
     const updatedData = req.body;
-    const classObj = await updateClass(classId, updatedData);
+    const classObj = await updateClassRecord(classId, updatedData);
     if (!classObj) return res.status(404).json({ message: 'Class not found' });
     res.json(classObj);
   } catch (err) {
@@ -181,7 +181,7 @@ export const updateClass = async (req, res) => {
 export const deleteClass = async (req, res) => {
   try {
     const { id: userId, classId } = req.params;
-    const classObj = await deleteClass(classId);
+    const classObj = await deleteClassRecord(classId);
     if (!classObj) return res.status(404).json({ message: 'Class not found' });
     await User.findByIdAndUpdate(userId, { $pull: { classes: classObj.name } });
     res.json({ message: 'Deleted successfully' });

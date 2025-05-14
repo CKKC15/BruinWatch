@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ClassSchema = new mongoose.Schema({
   name: { type: String },
@@ -8,4 +8,4 @@ const ClassSchema = new mongoose.Schema({
   videos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Class', ClassSchema);
+export default mongoose.model('Class', ClassSchema);
