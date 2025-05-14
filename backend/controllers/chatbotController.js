@@ -1,40 +1,128 @@
 import Video from '../models/video.js';
-import { createEmbeddings } from '../service/createEmbeddings.js';
-import { retrieveEmbeddings } from '../service/retrieveEmbeddings.js';
+import { createEmbeddings, retrieveEmbeddings } from '../service/embedding.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+/**
+ * Handle chat requests by finding relevant transcript chunks and generating responses
+ * @route POST /api/videos/:videoId/chat
+ */
 export const chat = async (req, res) => {
   try {
+    // Validate request
     const { videoId } = req.params;
     const { query } = req.body;
-    if (!query) return res.status(400).json({ message: 'Missing query' });
+    
+    if (!query || typeof query !== 'string' || query.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Missing or invalid query parameter' 
+      });
+    }
 
+    // Get video and associated transcript
     const video = await Video.findById(videoId);
-    if (!video) return res.status(404).json({ message: 'Video not found' });
+    if (!video) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Video not found' 
+      });
+    }
+    
+    // Check if transcript exists
+    if (!video.transcript || !Array.isArray(video.transcript) || video.transcript.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No transcript available for this video'
+      });
+    }
 
-    // transcriptChunks should be JSON array of {start,end,text}
+    // Create embeddings for transcript chunks if needed
+    // For production, consider caching embeddings for performance
+    console.log(`Processing query for video ${videoId}: "${query}"`);
     const transcriptChunks = video.transcript;
     const embedded = await createEmbeddings(transcriptChunks);
+    
+    // Retrieve most relevant chunks based on query similarity
     const topChunks = await retrieveEmbeddings(query, embedded, 5);
+    if (!topChunks.length) {
+      return res.status(200).json({
+        success: true,
+        answer: 'I couldn\'t find any relevant information in the video transcript to answer your query.',
+        sources: []
+      });
+    }
 
+    // Format context for LLM prompt with timestamps
     const contextText = topChunks
-      .map(c => `Timestamp ${c.start}-${c.end}: ${c.text}`)
+      .map(c => `Timestamp ${formatTimestamp(c.start)}-${formatTimestamp(c.end)}: ${c.text}`)
       .join('\n');
 
-    const prompt = `Context from the video:\n${contextText}\n\nUser Query: ${query}\n\nAnswer based on the above context:`;
+    // Create prompt for Gemini
+    const prompt = `
+      Context from the video transcript:
+      ${contextText}
+      
+      User Query: ${query}
+      
+      Answer the user's query based only on the provided context from the video transcript.
+      If the answer isn't clearly stated in the context, acknowledge this limitation.
+      When referencing specific timestamps, format them as [MM:SS] in your response.
+    `.trim();
 
-    // Initialize Gemini and generate response
-    if (!process.env.GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not set');
+    // Call Gemini API to generate response
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY environment variable not set');
+    }
+    
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    
     const result = await model.generateContent(prompt, {
-      generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+      generationConfig: { 
+        temperature: 0.3, // Lower temperature for more factual responses
+        maxOutputTokens: 1024,
+        topP: 0.8,
+        topK: 40
+      }
     });
+    
+    // Extract text response
     const answer = typeof result.response.text === 'function'
       ? await result.response.text()
       : result.response.text;
-    res.json({ answer, sources: topChunks });
+
+    // Format sources for client consumption (exclude embedding vectors to reduce payload size)
+    const formattedSources = topChunks.map(({ start, end, text, similarity }) => ({
+      start,
+      end,
+      text,
+      similarity: parseFloat(similarity.toFixed(4)), // Round to 4 decimal places
+      formattedTimespan: `${formatTimestamp(start)} - ${formatTimestamp(end)}`
+    }));
+
+    // Return successful response
+    res.json({ 
+      success: true,
+      answer, 
+      sources: formattedSources 
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error in chat controller:', err);
+    res.status(500).json({ 
+      success: false,
+      message: 'An error occurred while processing your request',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 };
+
+/**
+ * Format seconds as MM:SS timestamp
+ * @param {number} seconds - Time in seconds
+ * @returns {string} Formatted timestamp
+ */
+function formatTimestamp(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}

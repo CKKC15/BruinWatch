@@ -1,12 +1,9 @@
+// test/testChatbot.js
 import 'dotenv/config';
-import { createEmbeddings } from './service/createEmbeddings.js';
-import { retrieveEmbeddings } from './service/retrieveEmbeddings.js';
+import { createEmbeddings, retrieveEmbeddings } from './service/embedding.js'; // Update path as needed
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Change this query to test different prompts
-const query = "What is machine learning?";
-
-// Fake transcript chunks for testing
+// Sample transcript chunks for testing
 const transcriptChunks = [
   { start: 0.0,   end: 30.5,  text: "Machine learning is a subset of artificial intelligence that focuses on the ability of machines to learn from data without being explicitly programmed." },
   { start: 30.6,  end: 60.0,  text: "Neural networks are computational models inspired by the human brain, consisting of interconnected nodes or 'neurons' that process information." },
@@ -22,39 +19,78 @@ const transcriptChunks = [
 
 async function testChatbot() {
   try {
-    console.log('Creating embeddings...');
+    // Step 1: Create embeddings for all transcript chunks
+    console.log('Creating embeddings for transcript chunks...');
     const embedded = await createEmbeddings(transcriptChunks);
-
-    console.log('Retrieving relevant chunks...');
-    const topChunks = await retrieveEmbeddings(query, embedded, 5);
-
-    const contextText = topChunks
-      .map(c => `Timestamp ${c.start}-${c.end}: ${c.text}`)
-      .join('\n');
-    const prompt = `Context from the transcript:\n${contextText}\n\nUser Query: ${query}\n\nAnswer based on the above context:`;
-
-    console.log('Initializing Gemini model...');
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY is not set in .env file');
-    }
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
-    console.log('Generating response with Gemini...');
-    const result = await model.generateContent(prompt, {
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 1024
+    console.log(`Created embeddings for ${embedded.length} chunks successfully.`);
+    
+    // For testing different queries
+    const queries = [
+      "What are CNNs?",
+      "How do neural networks work?",
+      "What is reinforcement learning?"
+    ];
+    
+    // Process each query
+    for (const query of queries) {
+      console.log(`\n=== Processing query: "${query}" ===`);
+      
+      // Step 2: Retrieve relevant chunks for the query
+      console.log('Retrieving relevant chunks...');
+      const scored = await retrieveEmbeddings(query, embedded, 3); // Get top 3 relevant chunks
+      
+      // Display results
+      scored.forEach((c, i) => {
+        console.log(`#${i+1} • sim=${c.similarity.toFixed(4)} → ${c.text.slice(0,70)}...`);
+      });
+      
+      // Step 3: Generate response using Gemini AI with context
+      if (!process.env.GEMINI_API_KEY) {
+        console.error('GEMINI_API_KEY is not set in environment variables');
+        console.log('Skipping Gemini response generation...');
+        continue;
       }
-    });
+      
+      // Combine top chunks as context (use top 2 for better context)
+      const contextChunks = scored.slice(0, 2);
+      const context = contextChunks.map(c => c.text).join('\n\n');
+      
+      // Prepare the prompt with retrieved context
+      const prompt = `
+Context from the transcript:
+${context}
 
-    const answer = typeof result.response.text === 'function'
-      ? await result.response.text()
-      : result.response.text;
+User Query: ${query}
 
-    console.log('Answer:', answer);
+Answer the user's query based on the provided context. Be concise but thorough.
+      `.trim();
+      
+      // Generate response using Gemini
+      console.log('Generating response with Gemini AI...');
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      
+      const res = await model.generateContent(prompt, {
+        generationConfig: { 
+          temperature: 0.2, 
+          maxOutputTokens: 1024,
+          topP: 0.8,
+        }
+      });
+      
+      const answer = typeof res.response.text === 'function'
+        ? await res.response.text()
+        : res.response.text;
+        
+      console.log('\nGenerated Answer:');
+      console.log('-----------------');
+      console.log(answer);
+      console.log('-----------------');
+    }
+    
+    console.log('\nTest completed successfully');
   } catch (err) {
-    console.error('Test failed:', err);
+    console.error('Test failed with error:', err);
     process.exit(1);
   }
 }
