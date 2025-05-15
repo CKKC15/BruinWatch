@@ -3,8 +3,6 @@
 .page-container {
     display: flex;
     align-items: flex-start;
-    height: 100vh;
-    width: 100%;
     gap: 8px;
     padding: 8px;
 }
@@ -12,38 +10,38 @@
 
 .video-section {
     display: flex;
+    flex-direction: row;
     height: 100vh;
     width: 100%;
 }
 
 .video-container {
-    width: 65%;
-    max-width: 800px;
-    aspect-ratio: 16 / 9;
-    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.react-player {
+    width: 691px;
+    height: 426px;
 }
 
 
 
 /* styling for the tabs */
 
-.tab-section {
-    flex: 1;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
 .tabs-container {
     display: flex;
     flex-direction: column;
     position: relative;
-    width: 800px;
-    height: auto;
-    background: #EAE6E0;
-    margin: 50px auto;
+    width: 644px;
+    height: 937px;
+    background: #f0f0f0;
+    margin: 25px;
     word-break: break-all;
+    border-radius: 12px;
+    padding: 20px;
 
 }
 
@@ -52,11 +50,37 @@
 
 }
 
-.tabs-option {
+.tabs {
     padding: 15px;
     text-align: center;
     width: 100%;
     cursor: pointer;
     box-sizing: content-box;
     position: relative;
+}
+
+.active-tabs {
+    background-color: #DDD9E2;
+}
+
+.content-tabs {
+    flex-grow: 1;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.content hr {
+    width: 100px;
+    height: 2px;
+    background: #222;
+}
+
+.active-content {
+    display: block;
 }

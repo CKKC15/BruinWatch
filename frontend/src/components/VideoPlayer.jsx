@@ -1,29 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactPlayer from "react-player";
 import './VideoPlayer.css';
 
 export default function VideoPlayer() {
     const Tabs = () => {
+        const [toggleState, setToggleState] = useState(1);
+
+        const toggleTab = (index) => {
+            setToggleState(index)
+        }
+
         return (
             <div>
                 <div className="tabs-container">
                     <div className="bloc-tabs">
-                        <button className="tabs-option">Transcript</button>
-                        <button className="tabs-option">Whiteboard</button>
-                        <button className="tabs-option">Chat</button>
+                        <button className={toggleState === 1 ? 'tabs active-tabs' : 'tabs'}
+                            onClick={() => toggleTab(1)}>
+                            Transcript
+                        </button>
+                        <button className={toggleState === 2 ? 'tabs active-tabs' : 'tabs'}
+                            onClick={() => toggleTab(2)}>
+                            Bot
+                        </button>
+
+                        <button className={toggleState === 3 ? 'tabs active-tabs' : 'tabs'}
+                            onClick={() => toggleTab(3)}>
+                            Chat
+                        </button>
+
                     </div>
                     <div className="content-tabs">
-                        <div className="content active-content">
+                        <div className={toggleState === 1 ? 'content active-content' : 'content'}>
                             <h2>Transcript</h2>
                             <hr></hr>
                             <p>Insert transcript here</p>
                         </div>
-                        <div className="content active-content">
-                            <h2>Whiteboard</h2>
-                            <hr></hr>
-                            <p>Insert whiteboard here</p>
+                        <div className={toggleState === 2 ? 'content active-content' : 'content'}>
+
                         </div>
-                        <div className="content active-content">
+                        <div className={toggleState === 3 ? 'content active-content' : 'content'}>
                             <h2>Chat</h2>
                             <hr></hr>
                             <p>Insert chat here</p>
@@ -44,8 +59,6 @@ export default function VideoPlayer() {
                     <ReactPlayer
                         className="react-player"
                         url='https://youtu.be/e_04ZrNroTo?si=RU72z2S5nmrM62t0' //temporary url
-                        width='100%'
-                        height='100%'
                     />
                 </div>
             </div>
