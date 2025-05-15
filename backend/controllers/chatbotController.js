@@ -54,7 +54,7 @@ export const chat = async (req, res) => {
 
     // Format context for LLM prompt with timestamps
     const contextText = topChunks
-      .map(c => `Timestamp ${formatTimestamp(c.start)}-${formatTimestamp(c.end)}: ${c.text}`)
+      .map(c => `Timestamp ${formatTimestamp(c.start)} - ${formatTimestamp(c.end)}: ${c.text}`)
       .join('\n');
 
     // Create prompt for Gemini
