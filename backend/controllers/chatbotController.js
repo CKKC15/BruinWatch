@@ -54,19 +54,26 @@ export const chat = async (req, res) => {
 
     // Format context for LLM prompt with timestamps
     const contextText = topChunks
-      .map(c => `Timestamp ${formatTimestamp(c.start)}-${formatTimestamp(c.end)}: ${c.text}`)
+      .map(c => `Timestamp ${formatTimestamp(c.start)} - ${formatTimestamp(c.end)}: ${c.text}`)
       .join('\n');
 
     // Create prompt for Gemini
     const prompt = `
-      Context from the video transcript:
-      ${contextText}
-      
-      User Query: ${query}
-      
-      Answer the user's query based only on the provided context from the video transcript.
-      If the answer isn't clearly stated in the context, acknowledge this limitation.
-      When referencing specific timestamps, format them as [MM:SS] in your response.
+    You are an expert summarizer helping answer user questions using transcript excerpts.
+    
+    Transcript Context:
+    ${contextText}
+    
+    User Question:
+    ${query}
+    
+    Based only on the context, answer the question as clearly and directly as possible.
+    Make your answer sound like you are answering a question and make it sound smooth and understandable.
+    Reference timestamps in the context to provide a more accurate answer.
+    If the context doesnt provide the right answers to the question, explain it the best you can.
+    If the context does not contain a direct answer, briefly explain that and provide a possible answer.
+    
+    Be factual, concise, and helpful.
     `.trim();
 
     // Call Gemini API to generate response
