@@ -1,14 +1,32 @@
 // test/testChatbot.js
 import 'dotenv/config';
-import { createEmbeddings, retrieveEmbeddings } from './service/embedding.js';
+import { createEmbeddings, retrieveEmbeddings } from '../service/embedding.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+// Get the directory path to properly resolve .env from root
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load .env from the root backend directory (one level up)
+dotenv.config({ path: resolve(__dirname, '../.env') });
 
 // Read transcript chunks from file
-const transcriptPath = path.resolve('./testTranscript.txt');
-const transcriptRaw = fs.readFileSync(transcriptPath, 'utf8').trim();
-const transcriptChunks = eval(`(${transcriptRaw})`);
+const transcriptPath = path.resolve(__dirname, './testTranscript.txt');
+
+try {
+  const transcriptRaw = fs.readFileSync(transcriptPath, 'utf8').trim();
+  var transcriptChunks = eval(`(${transcriptRaw})`);
+  console.log(`Loaded ${transcriptChunks.length} transcript chunks from ${transcriptPath}`);
+} catch (error) {
+  console.error(`Error reading transcript file at ${transcriptPath}: ${error.message}`);
+  console.log('Make sure testTranscript.txt exists in the testing directory');
+  process.exit(1);
+}
 
 // Cache for embeddings to avoid creating them multiple times
 let cachedEmbeddings = null;
@@ -56,7 +74,18 @@ export async function queryTranscript(query) {
       console.log(`  #${idx+1} • sim=${chunk.similarity.toFixed(4)} • [${formatTimestamp(chunk.start)}-${formatTimestamp(chunk.end)}] → ${chunk.text.slice(0, 70)}...`);
     });
     
+    // Check if API key is available
+    if (!process.env.GEMINI_API_KEY) {
+      console.error('GEMINI_API_KEY not found in environment variables!');
+      console.log('Please make sure your .env file in the backend root directory contains a valid GEMINI_API_KEY');
+      return {
+        answer: "ERROR: GEMINI_API_KEY not configured",
+        relevantChunks: scored.slice(0, 5)
+      };
+    }
+    
     // Prepare Gemini AI for generating a response
+    console.log('Using Gemini API with configured key...');
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     
@@ -111,7 +140,7 @@ export async function queryTranscript(query) {
 }
 
 // Set your query here - change this value to test different queries
-const testQuery = "How does the computer turn code into assembly?";
+const testQuery = "what is a register?";
 
 // Automatically run the test query when this script is run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
