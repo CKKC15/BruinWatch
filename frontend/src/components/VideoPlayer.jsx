@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 import './VideoPlayer.css';
+import { io } from "socket.io-client"
+// const socket = io.connect("http://localhost:5001")
+
 
 export default function VideoPlayer() {
+
     const Tabs = () => {
         const [toggleState, setToggleState] = useState(1);
 
@@ -20,28 +24,24 @@ export default function VideoPlayer() {
                         </button>
                         <button className={toggleState === 2 ? 'tabs active-tabs' : 'tabs'}
                             onClick={() => toggleTab(2)}>
-                            Bot
+                            Chatbot
                         </button>
 
                         <button className={toggleState === 3 ? 'tabs active-tabs' : 'tabs'}
                             onClick={() => toggleTab(3)}>
                             Chat
                         </button>
-
                     </div>
                     <div className="content-tabs">
                         <div className={toggleState === 1 ? 'content active-content' : 'content'}>
-                            <h2>Transcript</h2>
-                            <hr></hr>
                             <p>Insert transcript here</p>
                         </div>
                         <div className={toggleState === 2 ? 'content active-content' : 'content'}>
-
+                            <p> Insert bot here</p>
                         </div>
                         <div className={toggleState === 3 ? 'content active-content' : 'content'}>
-                            <h2>Chat</h2>
-                            <hr></hr>
                             <p>Insert chat here</p>
+
                         </div>
                     </div>
                 </div>
