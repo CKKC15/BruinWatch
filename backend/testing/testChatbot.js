@@ -140,7 +140,7 @@ export async function queryTranscript(query) {
 }
 
 // Set your query here - change this value to test different queries
-const testQuery = "what is a register?";
+const testQuery = "what is machine learning";
 
 // Automatically run the test query when this script is run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
