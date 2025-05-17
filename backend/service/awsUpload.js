@@ -19,8 +19,7 @@ export async function uploadFileToS3(file, folder = 'uploads') {
     Bucket: process.env.S3_BUCKET,
     Key: key,
     Body: file.buffer,
-    ContentType: file.mimetype,
-    ACL: 'public-read'
+    ContentType: file.mimetype
   };
   const { Location } = await s3.upload(params).promise();
   return Location;
