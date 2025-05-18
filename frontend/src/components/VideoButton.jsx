@@ -1,6 +1,6 @@
 import React from "react";
 import { FaPlay } from "react-icons/fa";
-import "./VideoCard.css";
+import "./VideoButton.css";
 
 export default function VideoButton({ videoId, title, date, className, onClick }) {
   const handleClick = () => {
