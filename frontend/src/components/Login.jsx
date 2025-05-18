@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import './Login.css';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -52,7 +54,7 @@ const Login = () => {
       setTimeout(() => {
         console.log('Login successful with:', formData);
         setIsSubmitting(false);
-        // In a real app, you would navigate to the next page or set auth state
+        navigate('/dashboard');
       }, 1000);
     } else {
       setIsSubmitting(false);
@@ -61,14 +63,17 @@ const Login = () => {
 
   const handleGoogleSuccess = (credentialResponse) => {
     console.log('Google login successful:', credentialResponse);
-    // In a real app, you would send this token to your backend
+    // For development, just navigate to dashboard
+    alert('Google authentication is in development mode. Proceeding to dashboard...');
+    navigate('/dashboard');
   };
 
   const handleGoogleError = () => {
     console.log('Google login failed');
+    alert('Google authentication is in development mode. Please use the username/password form instead.');
     setErrors({
       ...errors,
-      google: 'Google sign-in failed. Please try again.'
+      google: 'Google sign-in is in development mode. Please use the form above.'
     });
   };
 
