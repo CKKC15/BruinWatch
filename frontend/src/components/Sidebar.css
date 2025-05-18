@@ -1,1 +1,45 @@
+.sidebar {
+  width: 80px;
+  background-color: #1c1c1e;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+.sidebar-logo {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.sidebar-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+  cursor: pointer;
+  font-size: 18px;
+  transition: color 0.2s;
+}
+
+.sidebar-icon span {
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+.sidebar-icon:hover {
+  color: #00bfff;
+}
+
+.sidebar-profile {
+  margin-top: auto;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
 
