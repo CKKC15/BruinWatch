@@ -1,48 +1,26 @@
-
 .topbar-wrapper {
-  width: 100%;                             
-  background-color: #ffffff;               
-  padding: 1rem 2rem;                      
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
-  display: flex;                           
-  justify-content: center;                
-  align-items: center;                    
-  position: sticky;                       
-  top: 0;                                  
-  z-index: 100;                            
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-
 
 .topbar-search {
-  width: 100%;                             
-  max-width: 800px;                        
-  display: flex;                           
-  align-items: center;                    
-  gap: 0.75rem;                            
-  background-color: #f5f5f5;               
-  border: 1px solid #ddd;                
-  border-radius: 8px;                    
-  padding: 0.5rem 1rem;                   
+  width: 100%;
+  max-width: 800px;
+  gap: 0.75rem;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
 }
-
 
 .topbar-icon {
-  color: #888;                             
-  font-size: 1.2rem;                       
+  color: #888;
+  font-size: 1.2rem;
 }
-
-
-.topbar-input {
-  flex: 1;                                 
-  font-size: 1rem;                        
-  border: none;                            
-  outline: none;                           
-  background: transparent;                 
-  color: #333;                          
-}
-
 
 .topbar-input::placeholder {
-  color: #aaa;                            
+  color: #aaa;
 }
-
