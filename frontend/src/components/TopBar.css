@@ -1,48 +1,48 @@
-/* Main wrapper for the top bar */
+
 .topbar-wrapper {
-  width: 100%;                              /* Span full width of the page */
-  background-color: #ffffff;               /* White background */
-  padding: 1rem 2rem;                      /* Padding: top/bottom 1rem, left/right 2rem */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Light shadow underneath */
-  display: flex;                           /* Flexbox for layout */
-  justify-content: center;                /* Center the content horizontally */
-  align-items: center;                    /* Center the content vertically */
-  position: sticky;                        /* Stay stuck to the top when scrolling */
-  top: 0;                                  /* Stick to the very top */
-  z-index: 100;                            /* Make sure it stays on top of other elements */
+  width: 100%;                             
+  background-color: #ffffff;               
+  padding: 1rem 2rem;                      
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
+  display: flex;                           
+  justify-content: center;                
+  align-items: center;                    
+  position: sticky;                       
+  top: 0;                                  
+  z-index: 100;                            
 }
 
-/* Container for the search bar */
+
 .topbar-search {
-  width: 100%;                             /* Fill available horizontal space */
-  max-width: 800px;                        /* Don’t get too wide on large screens */
-  display: flex;                           /* Use flex to place icon and input side by side */
-  align-items: center;                    /* Center items vertically */
-  gap: 0.75rem;                            /* Space between the icon and input */
-  background-color: #f5f5f5;               /* Light gray background for the search area */
-  border: 1px solid #ddd;                 /* Light gray border */
-  border-radius: 8px;                     /* Rounded corners */
-  padding: 0.5rem 1rem;                   /* Padding inside the search box */
+  width: 100%;                             
+  max-width: 800px;                        
+  display: flex;                           
+  align-items: center;                    
+  gap: 0.75rem;                            
+  background-color: #f5f5f5;               
+  border: 1px solid #ddd;                
+  border-radius: 8px;                    
+  padding: 0.5rem 1rem;                   
 }
 
-/* Search icon style */
+
 .topbar-icon {
-  color: #888;                             /* Medium gray color for the icon */
-  font-size: 1.2rem;                       /* Slightly larger icon size */
+  color: #888;                             
+  font-size: 1.2rem;                       
 }
 
-/* Search input field */
+
 .topbar-input {
-  flex: 1;                                 /* Take up remaining horizontal space */
-  font-size: 1rem;                         /* Normal readable font size */
-  border: none;                            /* Remove border */
-  outline: none;                           /* Remove highlight when clicked */
-  background: transparent;                 /* No background (use parent background) */
-  color: #333;                             /* Darker text color */
+  flex: 1;                                 
+  font-size: 1rem;                        
+  border: none;                            
+  outline: none;                           
+  background: transparent;                 
+  color: #333;                          
 }
 
-/* Style for placeholder text */
+
 .topbar-input::placeholder {
-  color: #aaa;                             /* Light gray placeholder text */
+  color: #aaa;                            
 }
 
