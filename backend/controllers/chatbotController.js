@@ -60,7 +60,7 @@ export const chat = async (req, res) => {
     });
     
     // Retrieve most relevant chunks based on query similarity
-    const topChunks = await retrieveEmbeddings(query, fixedEmbeddings, 5);
+    const topChunks = await retrieveEmbeddings(query, fixedEmbeddings, 10);
     
     // Debug output for retrieved chunks
     console.log(`Retrieved ${topChunks.length} chunks for query: "${query}"`);
@@ -104,12 +104,16 @@ export const chat = async (req, res) => {
     Transcript Context:
     ${context}
     
-    User Question: ${query}
+    User Question:
+    ${query}
     
-    Please provide a clear, concise answer to the user's question based on the transcript context.
-    Include relevant timestamps [MM:SS] from the transcript to support your answer.
+    Based only on the context, answer the question as clearly and directly as possible.
+    Make your answer sound like you are answering a question and make it sound smooth and understandable.
+    Reference timestamps in the context to provide a more accurate answer.
+    If the context doesnt provide the right answers to the question or a direct answer, explain it the best you can.
+    
     Be factual, concise, and helpful.
-    `;
+    `.trim();
     
     // Initialize Gemini and generate response
     if (!process.env.GEMINI_API_KEY) {
