@@ -1,0 +1,86 @@
+.dashboard-content {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Main Content Styles */
+.lecture-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.lecture-card {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.lecture-card:hover {
+  transform: translateY(-4px);
+}
+
+.lecture-video {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.lecture-info {
+  padding: 12px;
+}
+
+.lecture-info h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.bookmark-button,
+.options-button {
+  position: absolute;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bookmark-button {
+  top: 8px;
+  left: 8px;
+}
+
+.options-button {
+  top: 8px;
+  right: 8px;
+}
+
+.bookmark-button:hover,
+.options-button:hover {
+  transform: scale(1.1);
+  background-color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .lecture-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .lecture-grid {
+    grid-template-columns: 1fr;
+  }
+} 

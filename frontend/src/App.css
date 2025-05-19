@@ -1,8 +1,30 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f7f7f7;
+  color: #333;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  margin-left: 80px; /* Same width as navbar */
+  margin-top: 60px; /* Same height as topbar */
+  width: calc(100% - 80px);
+  min-height: calc(100vh - 60px);
+  background-color: #f7f7f7;
+  padding: 20px;
 }
 
 .logo {

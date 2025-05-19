@@ -1,42 +1,31 @@
-import React from "react";
+import React from 'react';
+import './VideoInput.css';
 
-export default function VideoInput(props) {
-  const { width, height } = props;
-
-  const inputRef = React.useRef();
-
-  const [source, setSource] = React.useState();
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    const url = URL.createObjectURL(file);
-    setSource(url);
-  };
-
-  const handleChoose = (event) => {
-    inputRef.current.click();
-  };
-
+const VideoInput = () => {
   return (
-    <div className="VideoInput">
-      <input
-        ref={inputRef}
-        className="VideoInput_input"
-        type="file"
-        onChange={handleFileChange}
-        accept=".mov,.mp4"
-      />
-      {!source && <button onClick={handleChoose}>Choose</button>}
-      {source && (
-        <video
-          className="VideoInput_video"
-          width="100%"
-          height={height}
-          controls
-          src={source}
+    <div className="video-input-container">
+      <h1>Upload Video</h1>
+      <p>This is the video upload page you would see after successful login.</p>
+      
+      <div className="upload-box">
+        <input 
+          type="file" 
+          id="video-upload" 
+          className="file-input"
+          accept="video/*"
         />
+<<<<<<< HEAD
       )}
-      <div className="VideoInput_footer">{source || "Nothing selectd"}</div>
+      <div className="VideoInput_footer">{source || "Nothing selected"}</div>
+=======
+        <label htmlFor="video-upload" className="upload-label">
+          <span className="upload-icon">+</span>
+          <span>Select a video file to upload</span>
+        </label>
+      </div>
+>>>>>>> dashboard
     </div>
   );
-}
+};
+
+export default VideoInput;

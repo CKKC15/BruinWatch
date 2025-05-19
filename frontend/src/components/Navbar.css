@@ -1,0 +1,94 @@
+.navbar {
+  width: 80px;
+  height: 100vh;
+  background: #fff;
+  color: #222;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: none;
+  z-index: 95;
+}
+
+.navbar-header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 18px 0 18px 0;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.navbar-logo {
+  width: 18px;
+  height: 18px;
+  background: #222;
+  border-radius: 4px;
+  margin-left: 12px;
+}
+
+.navbar-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #222;
+  margin-left: 4px;
+}
+
+.nav-icons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 55px;
+  margin-top: 120px;
+}
+
+.nav-icons li {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-icons a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav-icon {
+  font-size: 1.2rem;
+  color: #222;
+}
+
+.nav-icons a.active {
+  background: #4285F4;
+}
+
+.nav-icons a.active .nav-icon,
+.nav-icons a:hover .nav-icon {
+  color: #fff;
+}
+
+.nav-icons a:hover:not(.active) {
+  background: rgba(66, 133, 244, 0.1);
+}
+
+main {
+  margin-left: 80px;
+  padding: 2rem;
+  background: #f7f7f7;
+  min-height: 100vh;
+} 
