@@ -6,6 +6,8 @@ import User from '../models/user.js';
 import { createVideoRecord, fetchAllVideos, fetchVideoById, updateVideoRecord, deleteVideoRecord } from './videoController.js';
 import { uploadFileToS3 } from '../service/awsUpload.js';
 import { createClassRecord, fetchAllClasses, fetchClassById, updateClassRecord, deleteClassRecord } from './classController.js';
+import {transcribeMedia} from '../service/transcript.js';
+import {createEmbeddings} from '../service/embedding.js';
 
 // register and login user
 export const register = async (req, res) => {
@@ -75,11 +77,30 @@ export const getAllVideos = async (req, res) => {
 // create a new video and link to user
 export const createVideo = async (req, res) => {
   try {
-    const { title, transcript, className, date } = req.body;
+    const { title, className, date } = req.body;
     const { id: userId } = req.params;
     if (!title || !req.file) return res.status(400).json({ message: 'Missing fields' });
+    
+    // Upload video to S3
     const s3Url = await uploadFileToS3(req.file, 'videos');
-    const video = await createVideoRecord({ title, link: s3Url, transcript, userId, className, date });
+    
+    // Transcribe the video
+    const transcript = await transcribeMedia(req.file.buffer);
+    
+    // Generate embeddings
+    const embeddings = await createEmbeddings(transcript.segments);
+    
+    // Create video record with transcript
+    const video = await createVideoRecord({ 
+      title, 
+      link: s3Url, 
+      transcript,
+      embeddings,
+      userId, 
+      className, 
+      date 
+    });
+    
     await User.findByIdAndUpdate(userId, { $push: { videos: video._id } });
     res.status(201).json(video);
   } catch (err) {

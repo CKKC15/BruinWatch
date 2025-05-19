@@ -139,9 +139,9 @@ function cosineSimilarity(a, b) {
 /**
  * Retrieve the most relevant chunks based on embedding similarity.
  * @param {string} query - The query text to compare against chunks
- * @param {Array<{text: string, embedding: number[]}>} embeddedChunks - Chunks with embeddings
+ * @param {Array<{start: number, end: number, text: string, embedding: number[]}>} embeddedChunks - Chunks with embeddings
  * @param {number} topK - Number of top matches to return
- * @returns {Promise<Array<{text: string, embedding: number[], similarity: number}>>} Top matches with similarity scores
+ * @returns {Promise<Array<{start: number, end: number, text: string, embedding: number[], similarity: number}>>} Top matches with similarity scores
  */
 export async function retrieveEmbeddings(query, embeddedChunks, topK = 5) {
   if (embeddedChunks.length === 0) return [];

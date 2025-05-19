@@ -1,85 +1,96 @@
-// turn the old transcript code to a function we can call
-// main function you call is transcribeMedia
-
 import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
+import ffmpeg from 'fluent-ffmpeg';
+import stream from 'stream';
 import axios from 'axios';
 import FormData from 'form-data';
-import ffmpeg from 'fluent-ffmpeg';
 
-dotenv.config();
+dotenv.config({path: '../.env'});
 
 /**
- * Convert an .mp4 file to .mp3, saving alongside the source.
- * @param {string} inputPath
- * @returns {Promise<string>} path to the .mp3 file
+ * Convert MP4 buffer to MP3 stream (no files written)
  */
-function convertMp4ToMp3(inputPath) {
-  const dir     = path.dirname(inputPath);
-  const base    = path.basename(inputPath, '.mp4');
-  const outPath = path.join(dir, `${base}-tmp.mp3`);
-
+function convertMp4BufferToMp3Stream(mp4Buffer) {
   return new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
+    const inputStream = new stream.PassThrough();
+    inputStream.end(mp4Buffer);
+
+    const outputStream = new stream.PassThrough();
+
+    ffmpeg(inputStream)
+      .inputFormat('mp4')
       .noVideo()
       .audioCodec('libmp3lame')
       .audioBitrate('192k')
-      .on('end', () => resolve(outPath))
+      .format('mp3')
       .on('error', reject)
-      .save(outPath);
+      .pipe(outputStream, { end: true });
+
+    resolve(outputStream);
   });
 }
 
 /**
- * Send an audio stream to OpenAI Whisper and get back a transcript.
- * @param {fs.ReadStream} fileStream
- * @param {string} model
- * @returns {Promise<string>}
+ * Send MP3 stream to Whisper
  */
-async function whisperTranscribe(fileStream, model = 'whisper-1') {
-  const form = new FormData();
-  form.append('file', fileStream);
-  form.append('model', model);
+async function transcribeMp3Stream(mp3Stream) {
+  const formData = new FormData();
+  formData.append('file', mp3Stream, {
+    filename: 'audio.mp3',
+    contentType: 'audio/mpeg'
+  });
+  formData.append('model', 'whisper-1');
+  formData.append('response_format', 'verbose_json');
 
-  const resp = await axios.post(
+  console.log('📤 Uploading to OpenAI Whisper...');
+
+  const response = await axios.post(
     'https://api.openai.com/v1/audio/transcriptions',
-    form,
-    { headers: { 
-        ...form.getHeaders(),
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
-      }
+    formData,
+    {
+      headers: {
+        ...formData.getHeaders(),
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
     }
   );
 
-  return resp.data.text;
+  console.log(`✅ Received ${response.data.segments.length} segments`);
+  return response.data;
 }
 
 /**
- * Given a path to an .mp3 or .mp4 file, returns the transcript string.
- * @param {string} inputPath
- * @returns {Promise<string>}
+ * Main function – takes an MP4 buffer, returns transcript
  */
-export async function transcribeMedia(inputPath) {
-  const ext = path.extname(inputPath).toLowerCase();
-  let toTranscribePath = inputPath;
-  let cleanupTemp = false;
-
-  if (ext === '.mp4') {
-    toTranscribePath = await convertMp4ToMp3(inputPath);
-    cleanupTemp = true;
-  } else if (ext !== '.mp3') {
-    throw new Error('Unsupported file type. Only .mp3 and .mp4 are allowed.');
+export async function transcribeMedia(mp4Buffer) {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing OpenAI API key');
   }
 
   try {
-    const stream = fs.createReadStream(toTranscribePath);
-    return await whisperTranscribe(stream);
-  } finally {
-    if (cleanupTemp) {
-      fs.unlink(toTranscribePath, err => {
-        if (err) console.warn('Failed to clean up temp file:', err);
-      });
-    }
+    console.log('🎬 Converting MP4 buffer to MP3 stream...');
+    const mp3Stream = await convertMp4BufferToMp3Stream(mp4Buffer);
+
+    const data = await transcribeMp3Stream(mp3Stream);
+    const fullText = data.segments.map(s => s.text).join(' ');
+    
+    // Extract only the needed properties from each segment
+    const segments = data.segments.map(({ start, end, text }) => ({
+      start,
+      end,
+      text: text.trim()
+    }));
+
+    console.log('📝 Transcript segments:');
+    console.log(segments);
+
+    return {
+      fullText,
+      segments
+    };
+  } catch (err) {
+    console.error('❌ Error during transcription:', err.message);
+    throw err;
   }
 }
