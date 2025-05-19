@@ -143,7 +143,7 @@ function cosineSimilarity(a, b) {
  * @param {number} topK - Number of top matches to return
  * @returns {Promise<Array<{start: number, end: number, text: string, embedding: number[], similarity: number}>>} Top matches with similarity scores
  */
-export async function retrieveEmbeddings(query, embeddedChunks, topK = 5) {
+export async function retrieveEmbeddings(query, embeddedChunks, topK) {
   if (embeddedChunks.length === 0) return [];
   console.log(`Retrieving top ${topK} chunks for query: "${query}"`);
 
