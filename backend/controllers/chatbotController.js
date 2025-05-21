@@ -114,6 +114,33 @@ export const chat = async (req, res) => {
     
     Be factual, concise, and helpful.
     `.trim();
+
+    // open ai code
+    // if (!process.env.OPENAI_API_KEY) {
+    //   throw new Error('OPENAI_API_KEY environment variable not set');
+    // }
+    
+    // const openai = new OpenAI({
+    //   apiKey: process.env.OPENAI_API_KEY,
+    // });
+    
+    // const result = await openai.chat.completions.create({
+    //   model: "gpt-3.5-turbo", // You can use "gpt-4" for better quality if available
+    //   messages: [
+    //     {
+    //       role: "system",
+    //       content: "You are an expert summarizer that answers questions based on video transcripts."
+    //     },
+    //     {
+    //       role: "user",
+    //       content: prompt
+    //     }
+    //   ],
+    //   temperature: 0.3,
+    //   max_tokens: 1024,
+    // });
+    
+    // const answer = result.choices[0].message.content;
     
     // Initialize Gemini and generate response
     if (!process.env.GEMINI_API_KEY) {
@@ -125,7 +152,7 @@ export const chat = async (req, res) => {
     
     const result = await model.generateContent(prompt, {
       generationConfig: { 
-        temperature: 0.3, // Lower temperature for more factual responses
+        temperature: 0.3,
         maxOutputTokens: 1024
       }
     });
@@ -141,8 +168,7 @@ export const chat = async (req, res) => {
   } catch (err) {
     console.error('Error in chat controller:', err);
     res.status(500).json({ 
-      message: 'An error occurred while processing your request',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+      message: 'An error occurred while processing your request'
     });
   }
 };
