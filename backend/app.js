@@ -4,6 +4,7 @@ import userRoute from './routes/userRoute.js';
 import chatbotRoute from './routes/chatbotRoute.js';
 import passport from 'passport';
 import { setupGoogleAuth, googleAuth } from './service/googleAuth.js';
+import cors from 'cors';
 
 const app = express();
 const port = 5000;
@@ -12,6 +13,7 @@ const port = 5000;
 app.use(express.json());
 app.use(passport.initialize());
 
+app.use(cors());
 // Set up Google Auth
 setupGoogleAuth();
 

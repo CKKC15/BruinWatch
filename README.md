@@ -20,6 +20,13 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 FRONTEND_URL=your_frontend_url
 ```
 
+Refer to '.env.example' and create a `.env` file in the `frontend` directory.
+<br>
+Make sure your `.env` file is in `.gitignore`.
+```bash
+VITE_BACKEND_URL=http://localhost:5000
+```
+
 ### Frontend
 
 ```bash
