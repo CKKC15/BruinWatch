@@ -1,7 +1,7 @@
 // user route
 
 import express from 'express';
-import { register, login, logout, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo } from '../controllers/userController.js';
+import { register, login, logout, getCurrentUser, verifyGoogle, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo } from '../controllers/userController.js';
 import auth from '../middleware/auth.js';
 import multer from 'multer';
 const upload = multer();
@@ -12,6 +12,10 @@ const router = express.Router();
 router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', auth, logout);
+router.get('/me', auth, getCurrentUser);
+
+// Google OAuth client-side verification
+router.post('/verify', verifyGoogle);
 
 // update user
 router.put('/:id', auth, updateUser);

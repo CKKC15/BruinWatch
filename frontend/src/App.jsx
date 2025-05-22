@@ -13,7 +13,7 @@ import './App.css';
 
 function App() {
   // Dummy Google Client ID for development
-  const googleClientId = "123456789-abcdef.apps.googleusercontent.com";
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaGoogle } from 'react-icons/fa';
 import { GoogleLogin } from '@react-oauth/google';
 import './Login.css';
 
@@ -89,11 +90,9 @@ const Login = () => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
-        console.log(isLogin ? 'Login successful' : 'Registration successful', data);
         setIsSubmitting(false);
         navigate('/dashboard');
       } catch (error) {
-        console.error('Authentication error:', error);
         setErrors({
           ...errors,
           auth: error.message || 'Authentication failed. Please try again.'
@@ -106,44 +105,42 @@ const Login = () => {
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
-    console.log('Google login successful:', credentialResponse);
-    
     try {
-      // In a real implementation, you would send the credential to your backend
-      // For now, we'll just simulate the backend response
-      alert('Google authentication is in development mode. Proceeding to dashboard...');
-      
-      // You would typically do something like this:
-      /*
-      const response = await fetch('http://localhost:5000/auth/google', {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/verify`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ credential: credentialResponse.credential })
+        body: JSON.stringify({
+          credential: credentialResponse.credential
+        }),
+        credentials: 'include'
       });
-      
+
       const data = await response.json();
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      */
       
-      navigate('/dashboard');
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        navigate('/dashboard');
+      } else {
+        setErrors({
+          ...errors,
+          google: data.message || 'Google authentication failed'
+        });
+      }
     } catch (error) {
-      console.error('Google authentication error:', error);
       setErrors({
         ...errors,
-        google: 'Google authentication failed. Please try again.'
+        google: 'An error occurred during Google login'
       });
     }
   };
 
   const handleGoogleError = () => {
-    console.log('Google login failed');
-    alert('Google authentication is in development mode. Please use the email/password form instead.');
     setErrors({
       ...errors,
-      google: 'Google login is in development mode. Please use the form above.'
+      google: 'Google sign in was unsuccessful'
     });
   };
 
@@ -258,15 +255,10 @@ const Login = () => {
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
               useOneTap
-              shape="rectangular"
-              text={isLogin ? "signin_with" : "signup_with"}
               theme="filled_blue"
+              text={isLogin ? "signin_with" : "signup_with"}
+              shape="pill"
               size="large"
-              width="100%"
-              logo_alignment="left"
-              type="standard"
-              locale="en"
-              ux_mode="popup"
             />
           </div>
           {errors.google && <span className="error-message">{errors.google}</span>}

@@ -13,7 +13,12 @@ const port = 5000;
 app.use(express.json());
 app.use(passport.initialize());
 
-app.use(cors());
+// Enable CORS for all routes
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+
 // Set up Google Auth
 setupGoogleAuth();
 
