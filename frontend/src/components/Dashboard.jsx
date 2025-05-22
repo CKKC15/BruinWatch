@@ -1,12 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaRegStar } from 'react-icons/fa';
 import { BsThreeDotsVertical } from 'react-icons/bs';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
 
-  // Sample lecture data
+
   const lectures = [
     { id: 1, title: 'Lecture 1', video: 'dummy.mp4' },
     { id: 2, title: 'Lecture 2', video: 'dummy.mp4' },

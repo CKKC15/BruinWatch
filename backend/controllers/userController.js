@@ -3,6 +3,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
+import { verifyGoogleToken, findOrCreateGoogleUser } from '../service/googleAuth.js';
 import { createVideoRecord, fetchAllVideos, fetchVideoById, updateVideoRecord, deleteVideoRecord } from './videoController.js';
 import { uploadFileToS3 } from '../service/awsUpload.js';
 import { createClassRecord, fetchAllClasses, fetchClassById, updateClassRecord, deleteClassRecord } from './classController.js';
@@ -44,6 +45,51 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie('token');
   res.json({ message: 'Logged out' });
+};
+
+// get current user
+export const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// verify Google token and authenticate user
+export const verifyGoogle = async (req, res) => {
+  try {
+    const { credential } = req.body;
+    
+    if (!credential) {
+      return res.status(400).json({ message: 'Google token is required' });
+    }
+    
+    // Verify the Google token
+    const payload = await verifyGoogleToken(credential);
+    
+    // Find or create user based on Google profile
+    const user = await findOrCreateGoogleUser(payload);
+    
+    // Generate JWT token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    
+    // Return user info and token
+    res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture || payload.picture
+      }
+    });
+  } catch (err) {
+    console.error('Google verification error:', err);
+    res.status(401).json({ message: 'Invalid Google token' });
+  }
 };
 
 // update user info (by ID)

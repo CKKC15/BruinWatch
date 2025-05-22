@@ -39,4 +39,70 @@
   font-weight: 600;
   color: #222;
   margin: 0;
+}
+
+/* User profile section */
+.user-profile {
+  position: relative;
+  margin-right: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  transition: background-color 0.2s;
+}
+
+.user-info:hover {
+  background-color: #f5f5f5;
+}
+
+.user-greeting {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.profile-picture {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #4285f4;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 150px;
+  z-index: 1000;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: #4285f4;
 } 

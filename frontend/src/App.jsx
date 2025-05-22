@@ -7,17 +7,29 @@ import Navbar from './components/Navbar';
 import TopBar from './components/TopBar';
 import VideoInput from './components/VideoInput';
 import VideoPlayer from './components/VideoPlayer';
+import AddVideo from './components/AddVideo';
+import LandingPage from './components/LandingPage';
 import './App.css';
 
 function App() {
   // Dummy Google Client ID for development
-  const googleClientId = "123456789-abcdef.apps.googleusercontent.com";
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
       <Router>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={
+            <>
+              <Navbar />
+              <TopBar />
+              <main>
+                <Dashboard />
+              </main>
+            </>
+          } />
           <Route
             path="/*"
             element={
@@ -26,13 +38,13 @@ function App() {
                 <TopBar />
                 <main>
                   <Routes>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/add-video" element={<div>Add Video Page</div>} />
-                    <Route path="/info" element={<div>Info Page</div>} />
-                    <Route path="/profile" element={<div>Profile Page</div>} />
-                    <Route path="/videoplayer" element={<VideoPlayer />} />
-                    <Route path="/videoinput" element={<VideoInput />} />
-                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="add-video" element={<AddVideo />} />
+                    <Route path="info" element={<div>Info Page</div>} />
+                    <Route path="profile" element={<div>Profile Page</div>} />
+                    <Route path="videoplayer" element={<VideoPlayer />} />
+                    <Route path="videoinput" element={<VideoInput />} />
+                    <Route index element={<Dashboard />} />
                   </Routes>
                 </main>
               </>
