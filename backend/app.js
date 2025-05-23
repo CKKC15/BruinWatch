@@ -3,7 +3,6 @@ import connectDB from './db/mongo.js';
 import userRoute from './routes/userRoute.js';
 import chatbotRoute from './routes/chatbotRoute.js';
 import passport from 'passport';
-import { setupGoogleAuth, googleAuth } from './service/googleAuth.js';
 import cors from 'cors';
 
 const app = express();
@@ -19,9 +18,6 @@ app.use(cors({
   credentials: true
 }));
 
-// Set up Google Auth
-setupGoogleAuth();
-
 // basic root route
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -31,9 +27,6 @@ app.get('/', (req, res) => {
 app.use('/users', userRoute);
 app.use('/chat', chatbotRoute);
 
-// Google Auth routes
-app.get('/auth/google', googleAuth.authenticate);
-app.get('/auth/google/callback', googleAuth.callback);
 
 // start server and connect to db
 app.listen(port, async () => {

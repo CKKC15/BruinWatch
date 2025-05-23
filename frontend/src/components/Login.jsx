@@ -157,16 +157,16 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>{isLogin ? 'Welcome Back' : 'Create Account'}</h1>
-          <p>{isLogin ? 'Login to continue to BruinWatch' : 'Sign up to get started'}</p>
+    <div className="whole-container">
+      <div className="auth-container">
+        <div className="brand-title">
+          BruinWatch
         </div>
         
-        <form onSubmit={handleSubmit} className="login-form">
+        <div className="auth-card">
+          <form onSubmit={handleSubmit}>
           {!isLogin && (
-            <div className="form-group">
+            <div className="form-field">
               <label htmlFor="name">Name</label>
               <input
                 type="text"
@@ -174,14 +174,13 @@ const Login = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={errors.name ? 'error' : ''}
-                placeholder="Enter your full name"
+                placeholder="name"
               />
-              {errors.name && <span className="error-message">{errors.name}</span>}
+              {errors.name && <div className="error-message">{errors.name}</div>}
             </div>
           )}
           
-          <div className="form-group">
+          <div className="form-field">
             <label htmlFor="email">Email</label>
             <input
               type="email"
@@ -189,13 +188,12 @@ const Login = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={errors.email ? 'error' : ''}
-              placeholder="Enter your email"
+              placeholder="email"
             />
-            {errors.email && <span className="error-message">{errors.email}</span>}
+            {errors.email && <div className="error-message">{errors.email}</div>}
           </div>
           
-          <div className="form-group">
+          <div className="form-field">
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -203,14 +201,13 @@ const Login = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={errors.password ? 'error' : ''}
-              placeholder={isLogin ? 'Enter your password' : 'Create a password (min 6 characters)'}
+              placeholder="password"
             />
-            {errors.password && <span className="error-message">{errors.password}</span>}
+            {errors.password && <div className="error-message">{errors.password}</div>}
           </div>
           
           {!isLogin && (
-            <div className="form-group">
+            <div className="form-field">
               <label htmlFor="confirmPassword">Confirm Password</label>
               <input
                 type="password"
@@ -218,18 +215,17 @@ const Login = () => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={errors.confirmPassword ? 'error' : ''}
-                placeholder="Confirm your password"
+                placeholder="confirm password"
               />
-              {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+              {errors.confirmPassword && <div className="error-message">{errors.confirmPassword}</div>}
             </div>
           )}
           
-          {errors.auth && <div className="error-message auth-error">{errors.auth}</div>}
+          {errors.auth && <div className="error-message">{errors.auth}</div>}
           
           <button 
             type="submit" 
-            className="login-button"
+            className="auth-button"
             disabled={isSubmitting}
           >
             {isSubmitting 
@@ -237,31 +233,26 @@ const Login = () => {
               : (isLogin ? 'Login' : 'Sign Up')}
           </button>
           
-          <div className="form-footer">
-            {isLogin ? "Don't have an account? " : 'Already have an account? '}
-            <button type="button" className="toggle-form-button" onClick={toggleForm}>
-              {isLogin ? 'Sign Up' : 'Login'}
-            </button>
-          </div>
-        </form>
-        
-        <div className="separator">
-          <span>OR</span>
-        </div>
-        
-        <div className="google-login-container">
           <div className="google-button-container">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
               useOneTap
-              theme="filled_blue"
+              theme="outline"
               text={isLogin ? "signin_with" : "signup_with"}
-              shape="pill"
+              shape="rectangular"
               size="large"
             />
           </div>
-          {errors.google && <span className="error-message">{errors.google}</span>}
+          {errors.google && <div className="error-message">{errors.google}</div>}
+          
+          <div className="link-text">
+            {isLogin ? "Don't have an account? " : 'Already have an account? '}
+            <a href="#" onClick={(e) => {e.preventDefault(); toggleForm();}}>
+              {isLogin ? 'Sign up' : 'Sign in'}
+            </a>
+          </div>
+          </form>
         </div>
       </div>
     </div>

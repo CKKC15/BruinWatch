@@ -11,15 +11,46 @@ const LandingPage = () => {
 
   return (
     <div className="landing-container">
-      <div className="landing-content">
-        <h1 className="landing-title">BruinWatch</h1>
-        <p className="landing-subtitle">Your video learning platform</p>
-        <button 
-          className="get-started-button" 
-          onClick={handleGetStarted}
-        >
-          Get Started
-        </button>
+      <div className="landing-left">
+        <div className="logo-container">
+          <div className="logo">B</div>
+        </div>
+        <h1 className="brand-name">BruinWatch</h1>
+        <p className="tagline">
+          Revolutionizing the way students and educators engage<br />
+          with long-form lecture videos.
+        </p>
+      </div>
+      
+      <div className="landing-right">
+        <div className="feature-card">
+          <h2 className="feature-title">Learning Made Easier</h2>
+          
+          <div className="feature-description">
+            <p>
+              BruinWatch is an AI-powered web app designed to transform passive 
+              lecture watching into active, efficient learning.
+            </p>
+            
+            <p>
+              Our technology parses video transcripts, distills them into concise, 
+              easy-to-review notes, and smart search for key concepts instantly 
+              with direct timestamp navigation.
+            </p>
+            
+            <p>
+              Our mission is to streamline academic video consumption by making 
+              lectures searchable, navigable, and digestible!
+            </p>
+          </div>
+          
+          <button 
+            className="get-started-button" 
+            onClick={handleGetStarted}
+          >
+            Get Started
+          </button>
+        </div>
       </div>
     </div>
   );
