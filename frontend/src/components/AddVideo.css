@@ -1,21 +1,20 @@
 .add-video-container {
-  padding: 100;
+  padding: 20px;
   width: 100%;
   height: 100%;
   margin: 0;
   display: flex;
   flex-direction: column;
   min-height: 80vh;
+  background-color: #f5f5f5;
 }
-
-
 
 .add-video-content {
   display: flex;
   flex-direction: row;
   width: 100%;
   flex: 1;
-  gap: 0;
+  gap: 20px;
 }
 
 .upload-section, 
@@ -24,18 +23,26 @@
   width: 50%;
   background-color: #fff;
   box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
 .upload-section {
-  padding: 20px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .form-section {
   padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.upload-section {
-  border-right: 1px solid #e0e0e0;
+.upload-section, .form-section {
   display: flex;
   flex-direction: column;
 }
@@ -48,12 +55,11 @@
   .upload-section, 
   .form-section {
     width: 100%;
+    margin-bottom: 20px;
   }
   
   .upload-section {
-    padding: 10px;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 20px;
     min-height: 300px;
   }
   
@@ -65,14 +71,19 @@
 .upload-section h2, 
 .form-section h2 {
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   color: #333;
+  font-size: 1.5rem;
+  text-align: center;
+  padding-top: 20px;
 }
 
 .upload-section p, 
 .form-section p {
   color: #666;
   margin-bottom: 20px;
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 .form-group {
@@ -224,47 +235,218 @@
   cursor: not-allowed;
 }
 
-.youtube-form {
-  margin-top: 20px;
+/* File Upload Dropzone Styles */
+.file-upload-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  height: 100%;
 }
 
-.input-group {
+.dropzone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 25px;
+  margin: 15px auto;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+  height: 40%;
+  width: 60%;
+  position: relative;
+  overflow: visible;
+}
+
+.dropzone:hover {
+  border-color: #aaa;
+  background-color: #f5f5f5;
+}
+
+.dropzone.with-video {
+  cursor: pointer;
+  height: auto;
+  min-height: 40%;
+  padding: 15px;
+  padding-bottom: 20px;
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.dropzone-icon {
+  font-size: 2.5rem;
+  color: #ccc;
   margin-bottom: 15px;
 }
 
-.youtube-input {
-  flex: 1;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px 0 0 4px;
-  font-size: 14px;
+.dropzone-content p {
+  margin: 10px 0;
+  color: #666;
 }
 
-.youtube-submit {
-  background-color: #0056b3;
-  color: white;
+.browse-button {
+  background-color: #f0f0f0;
   border: none;
-  border-radius: 0 4px 4px 0;
-  padding: 0 20px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.youtube-submit:hover {
-  background-color: #003d82;
-}
-
-.youtube-submit:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.message {
-  margin-top: 10px;
-  padding: 10px;
+  padding: 8px 16px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.browse-button:hover {
+  background-color: #e0e0e0;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+/* YouTube Input Styles */
+.youtube-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.youtube-input-container {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 25px;
+  margin: 15px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa;
+  height: 40%;
+  width: 60%;
+  position: relative;
+  transition: height 0.3s ease;
+}
+
+.youtube-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.youtube-icon {
+  font-size: 2.5rem;
+  color: #ccc;
+  margin-bottom: 15px;
+}
+
+.youtube-url-input-container {
+  width: 100%;
+  margin: 20px 0 0 0;
+}
+
+.youtube-url-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.submit-youtube-button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  max-width: 200px;
+  margin-top: 10px;
+}
+
+.submit-youtube-button:hover {
+  background-color: #e0e0e0;
+}
+
+.youtube-error {
+  color: #d32f2f;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* Video Details Section */
+.video-details-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.video-preview-container {
+  width: 100%;
+  aspect-ratio: 16/9;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.inline-video-preview {
+  width: 75%;
+  border-radius: 6px;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+  padding-bottom: 0;
+}
+
+.inline-video-preview iframe, 
+.inline-video-preview video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 4px;
+  height: auto;
+  max-height: 200px;
+  margin-bottom: 10px;
+  border: 1px solid #eee;
+}
+
+.youtube-container-expanded {
+  height: auto;
+  overflow: visible;
+  padding: 15px;
+  padding-bottom: 20px;
+}
+
+.video-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .message.success {

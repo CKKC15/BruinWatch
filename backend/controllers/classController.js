@@ -19,3 +19,7 @@ export const updateClassRecord = async (classId, updatedData) => {
 export const deleteClassRecord = async (classId) => {
   return await Class.findByIdAndDelete(classId);
 };
+
+export const fetchAllClassesNames = async () => {
+  return await Class.find({}, { name: 1 });
+};
