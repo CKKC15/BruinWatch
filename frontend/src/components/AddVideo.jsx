@@ -7,8 +7,10 @@ import './AddVideo.css';
 import { FaFileVideo, FaLink } from 'react-icons/fa';
 
 const AddVideo = () => {
-  const [className, setClassName] = useState('');
-  const [date, setDate] = useState(null);
+  const [className, setClassName] = useState('');  
+  const [availableClasses, setAvailableClasses] = useState([]);
+  const [classLoading, setClassLoading] = useState(false);
+  const [date, setDate] = useState(new Date());
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -108,11 +110,42 @@ const AddVideo = () => {
     }
   };
   
-  // This function is now replaced by the auto-processing in handleYoutubeUrlChange
-
-  const handleClassNameChange = (e) => {
-    setClassName(e.target.value);
+    const handleClassNameSelect = (name) => {
+    setClassName(name);
   };
+
+  useEffect(() => {
+    const fetchClassNames = async () => {
+      setClassLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const userJson = localStorage.getItem('user');
+        
+        if (!token || !userJson) return;
+        
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/classnames`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch class names: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setAvailableClasses(data);
+      } catch (err) {
+        setAvailableClasses([]);
+      } finally {
+        setClassLoading(false);
+      }
+    };
+
+    fetchClassNames();
+  }, []);
 
   const handleDateChange = (date) => {
     setDate(date);
@@ -167,16 +200,26 @@ const AddVideo = () => {
               <p>Enter information about your YouTube video</p>
             
               <div className="form-group">
-                <label htmlFor="className">Class Name</label>
-                <input
-                  type="text"
-                  id="className"
-                  placeholder="Enter class name"
-                  value={className}
-                  onChange={handleClassNameChange}
-                  className="form-input"
-                  disabled={loading}
-                />
+                <label>Class Name</label>
+                {classLoading ? (
+                  <p>Loading class names...</p>
+                ) : availableClasses.length > 0 ? (
+                  <div className="class-buttons-container">
+                    {availableClasses.map((name, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        className={`class-button ${className === name ? 'selected' : ''}`}
+                        onClick={() => handleClassNameSelect(name)}
+                        disabled={loading}
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No available classes. Please create a class first.</p>
+                )}
               </div>
               
               <div className="form-group calendar-container">
@@ -252,16 +295,26 @@ const AddVideo = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="className">Class Name</label>
-                <input
-                  type="text"
-                  id="className"
-                  placeholder="Enter class name"
-                  value={className}
-                  onChange={handleClassNameChange}
-                  className="form-input"
-                  disabled={loading}
-                />
+                <label>Class Name</label>
+                {classLoading ? (
+                  <p>Loading class names...</p>
+                ) : availableClasses.length > 0 ? (
+                  <div className="class-buttons-container">
+                    {availableClasses.map((name, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        className={`class-button ${className === name ? 'selected' : ''}`}
+                        onClick={() => handleClassNameSelect(name)}
+                        disabled={loading}
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No available classes. Please create a class first.</p>
+                )}
               </div>
               
               <div className="form-group calendar-container">

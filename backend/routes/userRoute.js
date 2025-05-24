@@ -20,6 +20,16 @@ router.post('/verify', verifyGoogle);
 // update user
 router.put('/:id', auth, updateUser);
 
+// class routes under user
+router.post('/:id/classes', auth, createClass);
+router.get('/:id/classes', auth, getAllClasses);
+router.get('/:id/classes/:classId', auth, getClassById);
+router.put('/:id/classes/:classId', auth, updateClass);
+router.delete('/:id/classes/:classId', auth, deleteClass);
+
+// class name routes under user
+router.get('/:id/classnames', auth, getAllClassNames);
+
 // video routes under user
 router.post('/:id/videos', auth, upload.single('file'), createVideo);
 router.get('/:id/videos', auth, getAllVideos);

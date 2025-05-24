@@ -21,5 +21,11 @@ export const deleteClassRecord = async (classId) => {
 };
 
 export const fetchAllClassesNames = async () => {
-  return await Class.find({}, { name: 1 });
+  try {
+    const classes = await Class.find({}, { name: 1, _id: 0 }).lean();
+    return classes.map(c => c.name);
+  } catch (error) {
+    console.error('Error fetching class names:', error);
+    throw new Error('Failed to fetch class names');
+  }
 };
