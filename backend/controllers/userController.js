@@ -6,7 +6,7 @@ import User from '../models/user.js';
 import { verifyGoogleToken, findOrCreateGoogleUser } from '../service/googleAuth.js';
 import { createVideoRecord, fetchAllVideos, fetchVideoById, updateVideoRecord, deleteVideoRecord } from './videoController.js';
 import { uploadFileToS3 } from '../service/awsUpload.js';
-import { createClassRecord, fetchAllClasses, fetchClassById, updateClassRecord, deleteClassRecord } from './classController.js';
+import { createClassRecord, fetchAllClasses, fetchClassById, updateClassRecord, deleteClassRecord, fetchAllClassesNames } from './classController.js';
 import {transcribeMedia} from '../service/transcript.js';
 import {createEmbeddings} from '../service/embedding.js';
 
@@ -260,10 +260,8 @@ export const deleteClass = async (req, res) => {
 // fetch all class names for a user
 export const getAllClassNames = async (req, res) => {
   try {
-    const { id: userId } = req.params;
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user.classes);
+    const classNames = await fetchAllClassesNames();
+    res.json(classNames);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
