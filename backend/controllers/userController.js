@@ -2,11 +2,13 @@
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import User from '../models/user.js';
+import Class from '../models/class.js';
 import { verifyGoogleToken, findOrCreateGoogleUser } from '../service/googleAuth.js';
 import { createVideoRecord, fetchAllVideos, fetchVideoById, updateVideoRecord, deleteVideoRecord } from './videoController.js';
 import { uploadFileToS3 } from '../service/awsUpload.js';
-import { createClassRecord, fetchAllClasses, fetchClassById, updateClassRecord, deleteClassRecord, fetchAllClassesNames } from './classController.js';
+import { createClassRecord, fetchAllClasses, fetchClassById, updateClassRecord, deleteClassRecord, fetchAllClassesNames, fetchAllVideosFromClass } from './classController.js';
 import {transcribeMedia} from '../service/transcript.js';
 import {createEmbeddings} from '../service/embedding.js';
 
@@ -19,7 +21,7 @@ export const register = async (req, res) => {
     if (exists) return res.status(400).json({ message: 'User already exists' });
     const hashed = await bcrypt.hash(password, 12);
     const user = await User.create({ name, email, password: hashed });
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
     res.status(201).json({ user: { id: user._id, name: user.name, email: user.email }, token });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -34,7 +36,7 @@ export const login = async (req, res) => {
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: 'Invalid credentials' });
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
     res.json({ user: { id: user._id, name: user.name, email: user.email }, token });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -120,36 +122,55 @@ export const getAllVideos = async (req, res) => {
   }
 };
 
-// create a new video and link to user
+// create a new video and link to user and class
 export const createVideo = async (req, res) => {
   try {
     const { title, className, date } = req.body;
     const { id: userId } = req.params;
-    if (!title || !req.file) return res.status(400).json({ message: 'Missing fields' });
     
-    // Upload video to S3
+    if (!title || !req.file) {
+      return res.status(400).json({ message: 'Missing fields' });
+    }
+
+    // 1. Find the class by name
+    const classRecord = await Class.findOne({ name: className });
+    if (!classRecord) {
+      return res.status(404).json({ message: 'Class not found ' + className });
+    }
+
+    // 2. Upload video to S3
     const s3Url = await uploadFileToS3(req.file, 'videos');
     
-    // Transcribe the video
+    // 3. Transcribe the video
     const transcript = await transcribeMedia(req.file.buffer);
     
-    // Generate embeddings
+    // 4. Generate embeddings
     const embeddings = await createEmbeddings(transcript.segments);
     
-    // Create video record with transcript
+    // 5. Create video record with transcript
     const video = await createVideoRecord({ 
       title, 
       link: s3Url, 
       transcript,
       embeddings,
       userId, 
-      className, 
+      className,
       date 
     });
-    
-    await User.findByIdAndUpdate(userId, { $push: { videos: video._id } });
+
+    // 6. Link video to user
+    await User.findByIdAndUpdate(userId, { 
+      $push: { videos: video._id } 
+    });
+
+    // 7. Link video to class
+    await Class.findByIdAndUpdate(classRecord._id, {
+      $push: { videos: video._id }
+    });
+
     res.status(201).json(video);
   } catch (err) {
+    console.error('Error in createVideo:', err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -266,3 +287,16 @@ export const getAllClassNames = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// fetch all videos for a class
+export const getAllVideosForClass = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const videos = await fetchAllVideosFromClass(classId);
+    res.json(videos);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+

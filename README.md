@@ -16,8 +16,7 @@ AWS_REGION=your_aws_region
 S3_BUCKET=your_s3_bucket_name
 OPENAI_API_KEY=your_openai_api_key
 GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-FRONTEND_URL=your_frontend_url
+FRONTEND_URL=http://localhost:5173
 ```
 
 Refer to '.env.example' and create a `.env` file in the `frontend` directory.
@@ -25,6 +24,7 @@ Refer to '.env.example' and create a `.env` file in the `frontend` directory.
 Make sure your `.env` file is in `.gitignore`.
 ```bash
 VITE_BACKEND_URL=http://localhost:5000
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
 ```
 
 ### Frontend
