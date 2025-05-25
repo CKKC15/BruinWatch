@@ -1,86 +1,113 @@
-.dashboard-content {
-  width: 100%;
-  min-height: 100vh;
-  background-color: #f5f5f5;
+.dashboard-container {
+  padding: 40px;
 }
 
-/* Main Content Styles */
-.lecture-grid {
+.dashboard-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
-  padding: 20px;
 }
 
-.lecture-card {
-  background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.dashboard-card {
+  height: 120px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s ease;
 }
 
-.lecture-card:hover {
-  transform: translateY(-4px);
+.dashboard-card:hover {
+  transform: translateY(-3px);
 }
 
-.lecture-video {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.lecture-info {
-  padding: 12px;
-}
-
-.lecture-info h3 {
-  margin: 0;
-  font-size: 16px;
-  color: #333;
-}
-
-.bookmark-button,
-.options-button {
+.card-buttons {
   position: absolute;
-  background: none;
-  border: none;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+  color: black;
+}
+
+.card-label {
+  background-color: white;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.add-card {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 2px dashed #aaa;
+  color: #555;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  display: flex;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.9);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 999;
 }
 
-.bookmark-button {
-  top: 8px;
-  left: 8px;
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.options-button {
-  top: 8px;
-  right: 8px;
+.modal-content input[type="text"],
+.modal-content input[type="color"] {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
 }
 
-.bookmark-button:hover,
-.options-button:hover {
-  transform: scale(1.1);
-  background-color: white;
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .lecture-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
+.modal-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
-@media (max-width: 480px) {
-  .lecture-grid {
-    grid-template-columns: 1fr;
-  }
-} 
+.modal-buttons button:first-child {
+  background-color: #4caf50;
+  color: white;
+}
+
+.modal-buttons button:last-child {
+  background-color: #f44336;
+  color: white;
+}
