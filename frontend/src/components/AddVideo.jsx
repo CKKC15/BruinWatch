@@ -120,10 +120,11 @@ const AddVideo = () => {
       try {
         const token = localStorage.getItem('token');
         const userJson = localStorage.getItem('user');
+        const userId = JSON.parse(userJson).id
         
         if (!token || !userJson) return;
         
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/classnames`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/classnames`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

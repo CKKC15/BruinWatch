@@ -25,6 +25,7 @@ const Dashboard = () => {
   });
 
   const user = JSON.parse(localStorage.getItem('user'));
+  const token = localStorage.getItem('token');        
   const userId = user.id;
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [reloadFlag, setReloadFlag] = useState(false);
@@ -32,7 +33,11 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const res = await axios.get(`${backendUrl}/users/${userId}/get_classes`);
+        const res = await axios.get(`${backendUrl}/users/${userId}/get_classes`, {
+          headers: {
+            Authorization: `Bearer ${token}` // replace with your actual token
+          }
+        });
         const classCards = res.data.map(cls => ({
           id: cls._id,
           name: cls.name,
@@ -56,7 +61,13 @@ const Dashboard = () => {
         professor: formData.professor,
         term: formData.term,
         color: formData.color
-      });
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
   
       // Instead of manually adding to cards, trigger refetch
       setReloadFlag(prev => !prev);

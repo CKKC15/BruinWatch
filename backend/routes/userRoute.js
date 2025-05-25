@@ -1,7 +1,7 @@
 // user route
 
 import express from 'express';
-import { register, login, logout, getCurrentUser, verifyGoogle, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo, createClass, getAllClasses } from '../controllers/userController.js';
+import { register, login, logout, getCurrentUser, verifyGoogle, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo, createClass, getAllClasses, getClassById, updateClass, deleteClass, getAllClassNames } from '../controllers/userController.js';
 import auth from '../middleware/auth.js';
 import multer from 'multer';
 const upload = multer();
@@ -21,8 +21,8 @@ router.post('/verify', verifyGoogle);
 router.put('/:id', auth, updateUser);
 
 // class routes under user
-router.post('/:id/classes', auth, createClass);
-router.get('/:id/classes', auth, getAllClasses);
+router.post('/:id/create_class', auth, createClass);
+router.get('/:id/get_classes', auth, getAllClasses);
 router.get('/:id/classes/:classId', auth, getClassById);
 router.put('/:id/classes/:classId', auth, updateClass);
 router.delete('/:id/classes/:classId', auth, deleteClass);
@@ -36,10 +36,6 @@ router.get('/:id/videos', auth, getAllVideos);
 router.get('/:id/videos/:videoId', auth, getVideoById);
 router.put('/:id/videos/:videoId', auth, updateVideo);
 router.delete('/:id/videos/:videoId', auth, deleteVideo);
-
-// create class under user
-router.post('/:id/create_class', createClass);
-router.get('/:id/get_classes', getAllClasses);
 
 // video routes moved to videoRoute.js
 
