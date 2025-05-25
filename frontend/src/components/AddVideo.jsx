@@ -7,6 +7,7 @@ import './AddVideo.css';
 import { FaFileVideo, FaLink } from 'react-icons/fa';
 
 const AddVideo = () => {
+  const [lectureTitle, setLectureTitle] = useState('');
   const [className, setClassName] = useState('');  
   const [availableClasses, setAvailableClasses] = useState([]);
   const [classLoading, setClassLoading] = useState(false);
@@ -17,6 +18,7 @@ const AddVideo = () => {
   const [videoSource, setVideoSource] = useState(null); // 'file' or 'youtube'
   const [previewUrl, setPreviewUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [youtubeError, setYoutubeError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -111,7 +113,7 @@ const AddVideo = () => {
   };
   
     const handleClassNameSelect = (name) => {
-    setClassName(name);
+      setClassName(name);
   };
 
   useEffect(() => {
@@ -153,12 +155,12 @@ const AddVideo = () => {
   };
 
   const handleSave = async () => {
-    if (!file) {
-      setError('Please upload a video file');
+    if (!file && !youtubeUrl) {
+      setError('Please upload a video file or enter a YouTube URL');
       return;
     }
 
-    if (!className || !date) {
+    if (!lectureTitle || !className || !date) {
       setError('Please fill in all fields');
       return;
     }
@@ -167,14 +169,60 @@ const AddVideo = () => {
     setError('');
 
     try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const token = localStorage.getItem('token');        
+      const userId = user.id;
+
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      const formData = new FormData();
       
-      setSuccess(true);
-      // Navigate to video player page
+      // Add common fields
+      formData.append('title', lectureTitle);
+      formData.append('className', className);
+      formData.append('date', date.toISOString());
+      
+      if (file) {
+        // For file uploads - field name must be 'file' to match backend expectation
+        formData.append('file', file);
+      } else if (youtubeUrl) {
+        // For YouTube URLs
+        formData.append('youtubeUrl', youtubeUrl);
+      }
+
+      setStatus('Uploading video...');
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/videos`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData,
+        // We'll use this to track upload progress in the future if needed
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to upload video');
+      }
+
+      setStatus('Processing video (this may take a few minutes)...');
+      
+      // If you want to show more detailed progress, you could use Server-Sent Events (SSE)
+      // or WebSockets. For now, we'll just show a generic processing message.
+      
+      const data = await response.json();
+      setStatus('Processing complete! Redirecting...');
+      
+      // Navigate to the video player with the new video ID
       setTimeout(() => {
-        navigate(`/videoplayer/${video._id}`);
-      }, 1500);
+        navigate(`/videoplayer/${data.videoId || data._id}`);
+      }, 1000);
+      
     } catch (err) {
-      setError('Failed to create video: ' + err.message);
+      setError('Failed to save video: ' + (err.message || 'Unknown error'));
+      console.error('Error saving video:', err);
     } finally {
       setLoading(false);
     }
@@ -199,6 +247,18 @@ const AddVideo = () => {
             <div className="video-details-section">
               <h2>Video Details</h2>
               <p>Enter information about your YouTube video</p>
+            
+              <div className="form-group">
+                <label>Lecture Title</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={lectureTitle}
+                  onChange={(e) => setLectureTitle(e.target.value)}
+                  placeholder="Enter lecture title"
+                  disabled={loading}
+                />
+              </div>
             
               <div className="form-group">
                 <label>Class Name</label>
@@ -237,6 +297,8 @@ const AddVideo = () => {
               </div>
               
               {error && <div className="error-message">{error}</div>}
+              {status && <div className="status-message">{status}</div>}
+              {success && <div className="success-message">Video saved successfully! Redirecting to video player...</div>}
               
               <button 
                 onClick={handleSave} 
@@ -291,8 +353,16 @@ const AddVideo = () => {
               <h2>Video Details</h2>
               <p>Enter information about your uploaded video</p>
               
-              <div className="file-info">
-                <span>Selected file:</span> {fileName}
+              <div className="form-group">
+                <label>Lecture Title</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={lectureTitle}
+                  onChange={(e) => setLectureTitle(e.target.value)}
+                  placeholder="Enter lecture title"
+                  disabled={loading}
+                />
               </div>
               
               <div className="form-group">
@@ -332,7 +402,8 @@ const AddVideo = () => {
               </div>
               
               {error && <div className="error-message">{error}</div>}
-              {success && <div className="success-message">Video saved successfully! Redirecting to video player...</div>}
+              {status && <div className="status-message">{status}</div>}
+              {success && <div className="success-message">Video uploaded successfully! Redirecting...</div>}
               
               <button 
                 onClick={handleSave} 

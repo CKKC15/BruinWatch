@@ -3,6 +3,7 @@ import { FaRegStar } from 'react-icons/fa';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import axios from 'axios';
 import './Dashboard.css';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [cards, setCards] = useState([
@@ -29,6 +30,7 @@ const Dashboard = () => {
   const userId = user.id;
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [reloadFlag, setReloadFlag] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -79,13 +81,21 @@ const Dashboard = () => {
     }
   };
   
+  const handleClassClick = (card) => {
+    navigate(`/class/${card.id}`);
+  };
 
   return (
     <div className="dashboard-container">
       <h1 className="dashboard-title">Dashboard</h1>
       <div className="dashboard-grid">
         {cards.map(card => (
-          <div key={card.id} className="dashboard-card" style={{ backgroundColor: card.color }}>
+          <div 
+            key={card.id} 
+            className="dashboard-card" 
+            style={{ backgroundColor: card.color }}
+            onClick={() => handleClassClick(card)}
+          >
             <div className="card-buttons">
               {<FaRegStar size={20} />}
               <BsThreeDotsVertical size={20} />

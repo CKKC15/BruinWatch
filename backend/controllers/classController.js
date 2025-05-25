@@ -29,3 +29,8 @@ export const fetchAllClassesNames = async () => {
     throw new Error('Failed to fetch class names');
   }
 };
+
+export const fetchAllVideosFromClass = async (classId) => {
+  const classDoc = await Class.findById(classId);
+  return classDoc?.videos || [];
+};

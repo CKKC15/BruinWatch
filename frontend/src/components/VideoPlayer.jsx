@@ -1,11 +1,52 @@
 import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import ReactPlayer from "react-player";
 import './VideoPlayer.css';
 import { io } from "socket.io-client"
 // const socket = io.connect("http://localhost:5001")
 
-
 export default function VideoPlayer() {
+  const { videoId } = useParams();
+  const navigate = useNavigate();
+  const [video, setVideo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchVideo = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user.id;
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
+
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/videos/${videoId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch video');
+        }
+
+        const data = await response.json();
+        setVideo(data);
+      } catch (err) {
+        setError('Failed to load video. Please try again.');
+        console.error('Error fetching video:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (videoId) {
+      fetchVideo();
+    }
+  }, [videoId, navigate]);
 
     const Tabs = () => {
         const [toggleState, setToggleState] = useState(1);
@@ -56,10 +97,31 @@ export default function VideoPlayer() {
         <div className="page-container">
             <div className="video-section">
                 <div className="video-container">
-                    <ReactPlayer
-                        className="react-player"
-                        url='https://youtu.be/e_04ZrNroTo?si=RU72z2S5nmrM62t0' //temporary url
-                    />
+                    <div className="video-player-wrapper">
+                        {loading ? (
+                            <div className="loading-message">Loading video...</div>
+                        ) : error ? (
+                            <div className="error-message">{error}</div>
+                        ) : video?.link ? (
+                            <ReactPlayer
+                                className="react-player"
+                                url={video.link}
+                                width="100%"
+                                height="100%"
+                                controls
+                                config={{
+                                    file: {
+                                        attributes: {
+                                            controlsList: 'nodownload',
+                                            disablePictureInPicture: true
+                                        }
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <div className="error-message">No video source available</div>
+                        )}
+                    </div>
                 </div>
             </div>
 

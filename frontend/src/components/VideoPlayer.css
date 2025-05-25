@@ -1,30 +1,27 @@
-/* i'll copy this over to index.css later */
-
 .page-container {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
 }
 
 
 .video-section {
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-    width: 100%;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-top: 20vh;
 }
 
 .video-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .react-player {
-    width: 691px;
-    height: 426px;
+  width: 691px;
+  height: 426px;
 }
 
 
@@ -32,72 +29,144 @@
 /* styling for the tabs */
 
 .tabs-container {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    width: 644px;
-    height: 937px;
-    background: white;
-    margin: 25px;
-    word-break: break-all;
-    border-radius: 12px;
-    padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 644px;
+  height: 937px;
+  background: white;
+  margin: 25px;
+  word-break: break-all;
+  border-radius: 12px;
+  padding: 20px;
 
 }
 
 .bloc-tabs {
-    display: flex;
-    border-bottom: 1px solid #ccc4d4;
-    position: relative;
+  display: flex;
+  border-bottom: 1px solid #ccc4d4;
+  position: relative;
 
 }
 
 .tabs {
-    background: white;
-    padding: 15px;
-    text-align: center;
-    width: 100%;
-    cursor: pointer;
-    box-sizing: content-box;
-    position: relative;
+  background: white;
+  padding: 15px;
+  text-align: center;
+  width: 100%;
+  cursor: pointer;
+  box-sizing: content-box;
+  position: relative;
 }
 
 .active-tabs {
-    background-color: #ededee;
-    position: relative;
-    z-index: 1;
+  background-color: #ededee;
+  position: relative;
+  z-index: 1;
 }
 
 .active-tabs::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 5px;
-    background: black;
-    border-radius: 2px;
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 5px;
+  background: black;
+  border-radius: 2px;
 }
 
 .content-tabs {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .content {
-    flex-grow: 1;
-    padding: 20px;
-    width: 100%;
-    height: 100%;
-    display: none;
+  flex-grow: 1;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  display: none;
 }
 
 .content hr {
-    width: 100px;
-    height: 2px;
-    background: #222;
+  width: 100px;
+  height: 2px;
+  background: #222;
+}
+
+/* Loading and error messages */
+.loading-message,
+.error-message {
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100%;
+padding: 20px;
+text-align: center;
+font-size: 1.2rem;
+color: #333;
+background-color: #f5f5f5;
+border-radius: 8px;
+}
+
+.error-message {
+color: #d32f2f;
+background-color: #ffebee;
+border: 1px solid #ffcdd2;
+}
+
+/* Video container */
+.video-container {
+width: 100%;
+margin: 0 auto;
+padding: 20px;
+background: #f5f5f5;
+border-radius: 8px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Video player wrapper */
+.video-player-wrapper {
+position: relative;
+padding-top: 56.25%; /* 16:9 Aspect Ratio */
+width: 100%;
+background: #000;
+border-radius: 8px;
+overflow: hidden;
+}
+
+/* React player */
+.react-player {
+position: absolute;
+top: 0;
+left: 0;
+}
+
+/* Video element */
+.react-player video {
+position: absolute;
+top: 0;
+left: 0;
+width: 100% !important;
+height: 100% !important;
+object-fit: contain;
+background: #000;
+}
+
+/* Loading and error states */
+.loading-message,
+.error-message {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+color: white;
+font-size: 1.2rem;
+text-align: center;
+z-index: 10;
 }
 
 .active-content {
-    display: block;
+  display: block;
 }
