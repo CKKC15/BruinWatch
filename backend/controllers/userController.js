@@ -212,7 +212,7 @@ export const createClass = async (req, res) => {
     const { id: userId } = req.params;
     if (!name) return res.status(400).json({ message: 'Missing fields' });
     const newClass = await createClassRecord({ name, professor, term, color });
-    await User.findByIdAndUpdate(userId, { $push: { classes: newClass.name } });
+    await User.findByIdAndUpdate(userId, { $push: { classes: newClass._id } });
     res.status(201).json(newClass);
   } catch (err) {
     res.status(500).json({ message: err.message });
