@@ -1,8 +1,9 @@
 # BruinWatch
 
-![BruinWatch Logo](frontend/public/bruinwatch.png)
-
 Turn your lecture videos into an AI-powered agent that you can chat with!
+
+![BruinWatch](frontend/public/bruinwatch.png)
+
 
 ## Setup
 
