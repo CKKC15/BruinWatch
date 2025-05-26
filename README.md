@@ -2,6 +2,9 @@
 
 Turn your lecture videos into an AI-powered agent that you can chat with!
 
+![BruinWatch](frontend/public/bruinwatch.png)
+
+
 ## Setup
 
 Refer to '.env.example' and create a `.env` file in the `backend` directory.
