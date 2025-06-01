@@ -2,12 +2,21 @@ import express from 'express';
 import connectDB from './db/mongo.js';
 import userRoute from './routes/userRoute.js';
 import chatbotRoute from './routes/chatbotRoute.js';
+import passport from 'passport';
+import cors from 'cors';
 
 const app = express();
 const port = 5000;
 
 // middleware
 app.use(express.json());
+app.use(passport.initialize());
+
+// Enable CORS for all routes
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 
 // basic root route
 app.get('/', (req, res) => {
@@ -17,6 +26,7 @@ app.get('/', (req, res) => {
 // routes
 app.use('/users', userRoute);
 app.use('/chat', chatbotRoute);
+
 
 // start server and connect to db
 app.listen(port, async () => {

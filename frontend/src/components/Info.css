@@ -1,0 +1,20 @@
+.info-container {
+  display: flex;
+  height: 100vh;
+}
+
+.info-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+.info-header {
+  margin-bottom: 20px;
+}
+
+.info-title {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+}

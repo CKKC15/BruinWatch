@@ -1,6 +1,6 @@
 import Class from '../models/class.js';
 
-export const createClass = async ({ name, professor, term, color }) => {
+export const createClassRecord = async ({ name, professor, term, color }) => {
   return await Class.create({ name, professor, term, color });
 };
 
@@ -12,10 +12,25 @@ export const fetchClassById = async (classId) => {
   return await Class.findById(classId);
 };
 
-export const updateClass = async (classId, updatedData) => {
+export const updateClassRecord = async (classId, updatedData) => {
   return await Class.findByIdAndUpdate(classId, updatedData, { new: true });
 };
 
-export const deleteClass = async (classId) => {
+export const deleteClassRecord = async (classId) => {
   return await Class.findByIdAndDelete(classId);
+};
+
+export const fetchAllClassesNames = async () => {
+  try {
+    const classes = await Class.find({}, { name: 1, _id: 0 }).lean();
+    return classes.map(c => c.name);
+  } catch (error) {
+    console.error('Error fetching class names:', error);
+    throw new Error('Failed to fetch class names');
+  }
+};
+
+export const fetchAllVideosFromClass = async (classId) => {
+  const classDoc = await Class.findById(classId);
+  return classDoc?.videos || [];
 };

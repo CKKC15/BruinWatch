@@ -1,0 +1,134 @@
+.whole-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f5f5f5;
+  font-family: system-ui, sans-serif;
+}
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+}
+
+.brand-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.auth-card {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-field {
+  margin-bottom: 1.2rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.error-message {
+  color: #d93025;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #222;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 1rem 0;
+  transition: background 0.2s;
+}
+
+.auth-button:hover {
+  background-color: #000;
+}
+
+.auth-button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.google-divider {
+  text-align: center;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.google-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.link-text {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.link-text a {
+  color: #222;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.link-text a:hover {
+  text-decoration: underline;
+}
+
+.google-button:hover {
+  background-color: #357ae8;
+}
+
+.google-button-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+  .login-card {
+    padding: 30px 20px;
+  }
+
+  .login-header h1 {
+    font-size: 24px;
+  }
+} 

@@ -1,42 +1,76 @@
-import React from "react";
+  import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import './VideoInput.css';
 
-export default function VideoInput(props) {
-  const { width, height } = props;
+const VideoInput = forwardRef(({ onFileUploaded }, ref) => {
+  const [source, setSource] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(false);
+  const [error, setError] = useState('');
 
-  const inputRef = React.useRef();
+  useImperativeHandle(ref, () => ({
+    // Methods that parent can call
+    reset: () => {
+      setSource('');
+      setIsUploaded(false);
+      setError('');
+    }
+  }));
 
-  const [source, setSource] = React.useState();
-
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
-    const url = URL.createObjectURL(file);
-    setSource(url);
-  };
-
-  const handleChoose = (event) => {
-    inputRef.current.click();
+    if (file) {
+      setSource(file.name);
+      setIsUploading(true);
+      setError('');
+      
+      // Simulate upload process
+      try {
+        // For a real implementation, you might want to do pre-processing here
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setIsUploaded(true);
+        // Pass the file data back to parent component
+        if (onFileUploaded) {
+          onFileUploaded(file, file.name);
+        }
+      } catch (error) {
+        setError('Upload failed');
+        setIsUploaded(false);
+      } finally {
+        setIsUploading(false);
+      }
+    }
   };
 
   return (
-    <div className="VideoInput">
-      <input
-        ref={inputRef}
-        className="VideoInput_input"
-        type="file"
-        onChange={handleFileChange}
-        accept=".mov,.mp4"
-      />
-      {!source && <button onClick={handleChoose}>Choose</button>}
-      {source && (
-        <video
-          className="VideoInput_video"
-          width="100%"
-          height={height}
-          controls
-          src={source}
+    <div className="video-input-container">
+      <div className="upload-box" onClick={() => document.getElementById('video-upload').click()}>
+        <input 
+          type="file" 
+          id="video-upload" 
+          className="file-input"
+          accept="video/*"
+          onChange={handleFileChange}
         />
-      )}
-      <div className="VideoInput_footer">{source || "Nothing selected"}</div>
+        <label htmlFor="video-upload" className="upload-label">
+          <span className="upload-icon">+</span>
+          <span>Select a video file to upload</span>
+        </label>
+
+        <div className="VideoInput_footer">
+          {error && <div style={{ color: 'red', marginBottom: 6 }}>{error}</div>}
+          {isUploading ? (
+            <div>Uploading {source}...</div>
+          ) : isUploaded ? (
+            <div className="upload-success">
+              <div>{source} uploaded successfully!</div>
+            </div>
+          ) : (
+            <div>{source || "No file selected"}</div>
+          )}
+        </div>
+      </div>
     </div>
   );
-}
+});
+
+export default VideoInput;
