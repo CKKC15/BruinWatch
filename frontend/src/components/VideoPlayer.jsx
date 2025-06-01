@@ -217,13 +217,24 @@ export default function VideoPlayer() {
                     className="chat-input"
                     rows="1"
                     disabled={chatLoading}
+                    style={{
+                      height: 'auto',
+                      minHeight: '44px',
+                      maxHeight: '200px',
+                      resize: 'none',
+                      overflow: inputMessage.length > 100 ? 'auto' : 'hidden'
+                    }}
+                    onInput={(e) => {
+                      e.target.style.height = 'auto';
+                      e.target.style.height = e.target.scrollHeight + 'px';
+                    }}
                   />
                   <button 
                     onClick={handleSendMessage}
-                    className="send-button"
+                    className="send-button-inside"
                     disabled={!inputMessage.trim() || chatLoading}
                   >
-                    Send
+                    ↑
                   </button>
                 </div>
               </div>
