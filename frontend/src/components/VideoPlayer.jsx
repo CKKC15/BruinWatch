@@ -34,6 +34,8 @@ export default function VideoPlayer() {
         }
 
         const data = await response.json();
+        console.log('Video data:', data); // Debug log
+        console.log('Transcript data:', data.transcript); // Debug log
         setVideo(data);
       } catch (err) {
         setError('Failed to load video. Please try again.');
@@ -55,6 +57,50 @@ export default function VideoPlayer() {
             setToggleState(index)
         }
 
+        // Format timestamp to MM:SS
+        const formatTime = (seconds) => {
+            if (typeof seconds !== 'number') {
+                console.warn('Invalid timestamp:', seconds);
+                return '00:00';
+            }
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        };
+
+        // Helper to get transcript data
+        const getTranscript = () => {
+            if (!video) return [];
+            
+            // Check for segments array in the transcript object
+            if (video.transcript?.segments) {
+                return video.transcript.segments;
+            }
+            // Fallback to direct transcript array
+            else if (video.transcript) {
+                return Array.isArray(video.transcript) ? video.transcript : [];
+            }
+            // Check other possible locations
+            else if (video.transcripts?.segments) {
+                return video.transcripts.segments;
+            } 
+            else if (video.transcripts) {
+                return Array.isArray(video.transcripts) ? video.transcripts : [];
+            } 
+            else if (video.transcription?.segments) {
+                return video.transcription.segments;
+            }
+            else if (video.transcription) {
+                return Array.isArray(video.transcription) ? video.transcription : [];
+            }
+            
+            console.log('No transcript found in video object. Available keys:', Object.keys(video));
+            return [];
+        };
+        
+        const transcript = getTranscript();
+        console.log('Processed transcript data:', transcript);
+
         return (
             <div>
                 <div className="tabs-container">
@@ -67,7 +113,6 @@ export default function VideoPlayer() {
                             onClick={() => toggleTab(2)}>
                             Chatbot
                         </button>
-
                         <button className={toggleState === 3 ? 'tabs active-tabs' : 'tabs'}
                             onClick={() => toggleTab(3)}>
                             Chat
@@ -75,22 +120,39 @@ export default function VideoPlayer() {
                     </div>
                     <div className="content-tabs">
                         <div className={toggleState === 1 ? 'content active-content' : 'content'}>
-                            <p>Insert transcript here</p>
+                            <div className="transcript-container">
+                                {transcript.length > 0 ? (
+                                    <div className="transcript-content">
+                                        {transcript.map((entry, index) => {
+                                            // Handle both segment objects with start/end/text and direct text entries
+                                            const text = entry.text || entry;
+                                            const startTime = entry.start || 0;
+                                            
+                                            return (
+                                                <div key={index} className="transcript-entry">
+                                                    <span className="transcript-timestamp">
+                                                        {formatTime(startTime)}
+                                                    </span>
+                                                    <span className="transcript-text">{text}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <p>No transcript available for this video.</p>
+                                )}
+                            </div>
                         </div>
                         <div className={toggleState === 2 ? 'content active-content' : 'content'}>
-                            <p> Insert bot here</p>
+                            <p>Insert bot here</p>
                         </div>
                         <div className={toggleState === 3 ? 'content active-content' : 'content'}>
                             <p>Insert chat here</p>
-
                         </div>
                     </div>
                 </div>
-
             </div>
         );
-
-
     }
 
     return (
