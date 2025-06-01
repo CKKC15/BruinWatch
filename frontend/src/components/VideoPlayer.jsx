@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactPlayer from "react-player";
 import './VideoPlayer.css';
@@ -11,6 +11,14 @@ export default function VideoPlayer() {
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const playerRef = useRef(null);
+  
+  // Function to seek video to specific time
+  const seekToTime = (timeInSeconds) => {
+    if (playerRef.current) {
+      playerRef.current.seekTo(timeInSeconds, 'seconds');
+    }
+  };
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -50,7 +58,7 @@ export default function VideoPlayer() {
     }
   }, [videoId, navigate]);
 
-    const Tabs = () => {
+    const Tabs = ({ onSeek }) => {
         const [toggleState, setToggleState] = useState(1);
 
         const toggleTab = (index) => {
@@ -129,11 +137,15 @@ export default function VideoPlayer() {
                                             const startTime = entry.start || 0;
                                             
                                             return (
-                                                <div key={index} className="transcript-entry">
-                                                    <span className="transcript-timestamp">
-                                                        {formatTime(startTime)}
-                                                    </span>
-                                                    <span className="transcript-text">{text}</span>
+                                                <div 
+                                                  key={index} 
+                                                  className="transcript-entry"
+                                                  onClick={() => onSeek(startTime)}
+                                                >
+                                                  <span className="transcript-timestamp">
+                                                    {formatTime(startTime)}
+                                                  </span>
+                                                  <span className="transcript-text">{text}</span>
                                                 </div>
                                             );
                                         })}
@@ -166,6 +178,7 @@ export default function VideoPlayer() {
                             <div className="error-message">{error}</div>
                         ) : video?.link ? (
                             <ReactPlayer
+                                ref={playerRef}
                                 className="react-player"
                                 url={video.link}
                                 width="100%"
@@ -188,7 +201,7 @@ export default function VideoPlayer() {
             </div>
 
             <div className="tab-section">
-                <Tabs />
+                <Tabs onSeek={seekToTime} />
             </div>
         </div>
 
