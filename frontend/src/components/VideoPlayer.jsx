@@ -17,6 +17,61 @@ function formatTimestamp(seconds) {
   }
 }
 
+function parseTimeToSeconds(timeStr) {
+  // Handle MM:SS or H:MM:SS format
+  const timeParts = timeStr.split(':').map(part => parseInt(part, 10));
+  if (timeParts.length === 2) {
+    // MM:SS
+    return timeParts[0] * 60 + timeParts[1];
+  } else if (timeParts.length === 3) {
+    // H:MM:SS
+    return timeParts[0] * 3600 + timeParts[1] * 60 + timeParts[2];
+  }
+  return 0;
+}
+
+function renderMessageWithTimestamps(content, onTimestampClick) {
+  // Regex to match timestamps like "2:35", "1:23:45", "at 2:35", etc.
+  const timestampRegex = /(\b(?:at\s+)?(\d{1,2}):(\d{2})(?::(\d{2}))?\b)/gi;
+  
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = timestampRegex.exec(content)) !== null) {
+    // Add text before timestamp
+    if (match.index > lastIndex) {
+      parts.push(content.slice(lastIndex, match.index));
+    }
+
+    // Extract timestamp and convert to seconds
+    const fullMatch = match[1];
+    const timeOnly = match[0].replace(/^at\s+/i, ''); // Remove "at " if present
+    const seconds = parseTimeToSeconds(timeOnly);
+
+    // Add clickable timestamp
+    parts.push(
+      <span
+        key={match.index}
+        className="clickable-timestamp"
+        onClick={() => onTimestampClick(seconds)}
+        title={`Jump to ${timeOnly}`}
+      >
+        {fullMatch}
+      </span>
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text
+  if (lastIndex < content.length) {
+    parts.push(content.slice(lastIndex));
+  }
+
+  return parts.length > 1 ? parts : content;
+}
+
 export default function VideoPlayer() {
   const { videoId } = useParams();
   const navigate = useNavigate();
@@ -189,7 +244,10 @@ export default function VideoPlayer() {
                   {messages.map((message, index) => (
                     <div key={index} className={`message ${message.type}`}>
                       <div className="message-content">
-                        {message.content}
+                        {message.type === 'bot' 
+                          ? renderMessageWithTimestamps(message.content, seekToTime)
+                          : message.content
+                        }
                       </div>
                     </div>
                   ))}

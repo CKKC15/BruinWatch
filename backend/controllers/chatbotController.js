@@ -60,7 +60,7 @@ export const chat = async (req, res) => {
     });
     
     // Retrieve most relevant chunks based on query similarity
-    const topChunks = await retrieveEmbeddings(query, fixedEmbeddings, 10);
+    const topChunks = await retrieveEmbeddings(query, fixedEmbeddings, 12);
     
     // Debug output for retrieved chunks
     console.log(`Retrieved ${topChunks.length} chunks for query: "${query}"`);
