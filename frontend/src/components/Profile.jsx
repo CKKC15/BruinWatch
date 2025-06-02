@@ -1,19 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Profile.css';
-import { FaEdit } from 'react-icons/fa';
+//import { FaEdit } from 'react-icons/fa';
 
 const Profile = () => {
   const navigate = useNavigate();
 
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-  const handleSubmit = (e) => {
+  const handleInputChange = (e) => {
+    setUser({
+      ...user, [e.target.name]: e.target.value,
+    });
+  };
+
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userID = storedUser?.id;
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Profile updated with:', { fullName, email, password });
-    alert('Profile saved!');
+
+    try {
+      const res = await fetch(`/api/users/${userID}`, {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (res.ok) {
+        alert("Profile successfully changed!");
+      }
+      else {
+        alert("Something went wrong");
+      }
+    } catch (err) {
+      alert("Connection error");
+    }
   };
 
   return (
@@ -27,32 +55,35 @@ const Profile = () => {
             className="avatar"
           />
         </div>
-        <form onSubmit={handleSubmit}>
+        <form className="profile-form" onSubmit={handleSubmit}>
           <label>
             Full Name
             <input
               type="text"
+              name="name"
               placeholder="Ucla Student"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              value={user.name}
+              onChange={handleInputChange}
             />
           </label>
           <label>
             Email
             <input
               type="email"
+              name="email"
               placeholder="student@ucla.edu"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={user.email}
+              onChange={handleInputChange}
             />
           </label>
           <label>
             Password
             <input
               type="password"
+              name="password"
               placeholder="passwordis1234"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handleInputChange}
             />
           </label>
           <button type="submit">Save</button>
