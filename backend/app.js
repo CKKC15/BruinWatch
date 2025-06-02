@@ -6,7 +6,7 @@ import passport from 'passport';
 import cors from 'cors';
 
 const app = express();
-const port = 5000;
+const port = 3000;
 
 // middleware
 app.use(express.json());
