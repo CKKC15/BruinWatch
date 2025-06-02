@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import User from '../models/user.js';
 import Class from '../models/class.js';
+import Video from '../models/video.js';
 import { verifyGoogleToken, findOrCreateGoogleUser } from '../service/googleAuth.js';
 import { createVideoRecord, fetchAllVideos, fetchVideoById, updateVideoRecord, deleteVideoRecord } from './videoController.js';
 import { uploadFileToS3 } from '../service/awsUpload.js';
@@ -265,15 +266,36 @@ export const updateClass = async (req, res) => {
   }
 };
 
-// delete class and unlink from user
 export const deleteClass = async (req, res) => {
   try {
     const { id: userId, classId } = req.params;
+
+    // First, get the class so we can access its name
     const classObj = await deleteClassRecord(classId);
     if (!classObj) return res.status(404).json({ message: 'Class not found' });
-    await User.findByIdAndUpdate(userId, { $pull: { classes: classObj.name } });
-    res.json({ message: 'Deleted successfully' });
+
+    // Find all videos by user for this class name
+    const videos = await Video.find({
+      className: classObj.name,
+      user: userId
+    });
+
+    // Delete all matching videos
+    for (const video of videos) {
+      await Video.findByIdAndDelete(video._id);
+      await User.findByIdAndUpdate(userId, {
+        $pull: { videos: video._id }
+      });
+    }
+
+    // Unlink the class from the user
+    await User.findByIdAndUpdate(userId, {
+      $pull: { classes: classObj._id }
+    });
+
+    res.json({ message: 'Class and related videos deleted successfully' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };

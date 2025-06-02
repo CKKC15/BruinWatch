@@ -25,7 +25,7 @@ router.post('/:id/create_class', auth, createClass);
 router.get('/:id/get_classes', auth, getAllClasses);
 router.get('/:id/classes/:classId', auth, getClassById);
 router.put('/:id/classes/:classId', auth, updateClass);
-router.delete('/:id/classes/:classId', auth, deleteClass);
+router.delete('/:id/delete_class/:classId', auth, deleteClass);
 router.get('/:id/classes/:classId/videos', auth, getAllVideosForClass);
 // class name routes under user
 router.get('/:id/classnames', auth, getAllClassNames);

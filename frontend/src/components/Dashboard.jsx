@@ -1,21 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { FaRegStar } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaRegStar} from 'react-icons/fa';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import axios from 'axios';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const [cards, setCards] = useState([
-    { id: 1, title: 'MATH 32B: Multivariable Calculus', color: '#a6e7ff'},
-    { id: 2, title: 'CS 31: Intro to C++', color: '#ffb9b9'},
-    { id: 3, title: 'MATH 33A: Linear Algebra', color: '#ffe2a6'},
-    { id: 4, title: 'DESMA 21: Drawing & Color', color: '#b9ffd9'},
-    { id: 5, title: 'MATH 32B Lecture 15', color: '#d4e7c5' },
-    { id: 6, title: 'CS 31 Lecture 17', color: '#7c99b4' },
-    { id: 7, title: 'MATH 33A Lecture 10', color: '#f2e38b' },
-    { id: 8, title: 'DESMA 21 Lecture 16', color: '#e36d2f' },
-  ]);
+  const [cards, setCards] = useState([]);
 
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,6 +22,8 @@ const Dashboard = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [reloadFlag, setReloadFlag] = useState(false);
   const navigate = useNavigate();
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -53,7 +46,23 @@ const Dashboard = () => {
     };
   
     fetchClasses();
-  }, [reloadFlag]); // 👈 rerun effect whenever reloadFlag changes
+  }, [reloadFlag]); // rerun effect whenever reloadFlag changes
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setOpenDropdownId(null);
+      }
+    };
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   
 
   const handleCreate = async () => {
@@ -80,6 +89,24 @@ const Dashboard = () => {
       alert('Failed to create class. Please try again.');
     }
   };
+
+  const handleDelete = async (classId) => {
+    try {
+      await axios.delete(
+        `${backendUrl}/users/${userId}/delete_class/${classId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      // Trigger refetch
+      setReloadFlag(prev => !prev);
+      console.log("class delete and video delete successful")
+    } catch (err) {
+      console.error('Error deleting class:', err.response?.data || err.message);
+      alert('Unable to delete class. Please try again.');
+    }
+  };
+  
   
   const handleClassClick = (card) => {
     navigate(`/class/${card.id}`);
@@ -89,22 +116,66 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <h1 className="dashboard-title">Dashboard</h1>
       <div className="dashboard-grid">
-        {cards.map(card => (
-          <div 
-            key={card.id} 
-            className="dashboard-card" 
-            style={{ backgroundColor: card.color }}
-            onClick={() => handleClassClick(card)}
+      {cards.map(card => (
+      <div
+        key={card.id}
+        className="dashboard-card"
+        style={{ backgroundColor: card.color }}
+        onClick={() => handleClassClick(card)}
+      >
+        <div className="card-buttons">
+          <FaRegStar size={20} />
+
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenDropdownId(openDropdownId === card.id ? null : card.id);
+            }}
+            style={{ position: 'relative', cursor: 'pointer' }}
           >
-            <div className="card-buttons">
-              {<FaRegStar size={20} />}
-              <BsThreeDotsVertical size={20} />
-            </div>
-            <div className="card-label">
-              <p>{card.name}</p>
-            </div>
+            <BsThreeDotsVertical size={20} />
+
+            {openDropdownId === card.id && (
+              <div
+                ref={dropdownRef}
+                className="card-dropdown"
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  position: 'absolute',
+                  top: '24px',
+                  right: '0',
+                  backgroundColor: '#fff',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  zIndex: 10,
+                  boxShadow: '0px 2px 6px rgba(0,0,0,0.1)'
+                }}
+              >
+                <div
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this class?')) {
+                      handleDelete(card.id);
+                    }
+                  }}
+                  style={{
+                    padding: '8px 12px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  Delete
+                </div>
+              </div>
+            )}
           </div>
-        ))}
+        </div>
+
+        <div className="card-label">
+          <p>{card.name}</p>
+        </div>
+      </div>
+    ))}
+
         <div className="dashboard-card add-card" onClick={() => setShowForm(true)}>
           <p>+ Add Class</p>
         </div>
