@@ -1,7 +1,7 @@
 // user route
 
 import express from 'express';
-import { register, login, logout, getCurrentUser, verifyGoogle, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo, createClass, getAllClasses, getClassById, updateClass, deleteClass, getAllClassNames, getAllVideosForClass, findKeywordInVideo } from '../controllers/userController.js';
+import { register, login, logout, getCurrentUser, verifyGoogle, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo, createClass, getAllClasses, getClassById, updateClass, deleteClass, getAllClassNames, getAllVideosForClass, findKeywordInVideo, joinClass } from '../controllers/userController.js';
 import auth from '../middleware/auth.js';
 import multer from 'multer';
 const upload = multer();
@@ -27,8 +27,8 @@ router.get('/:id/classes/:classId', auth, getClassById);
 router.put('/:id/classes/:classId', auth, updateClass);
 router.delete('/:id/delete_class/:classId', auth, deleteClass);
 router.get('/:id/classes/:classId/videos', auth, getAllVideosForClass);
-// class name routes under user
 router.get('/:id/classnames', auth, getAllClassNames);
+router.post('/:id/join/:classId', auth, joinClass);
 
 // video routes under user
 router.post('/:id/videos', auth, upload.single('file'), createVideo);
