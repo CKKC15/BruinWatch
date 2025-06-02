@@ -34,3 +34,4 @@ export const fetchAllVideosFromClass = async (classId) => {
   const classDoc = await Class.findById(classId);
   return classDoc?.videos || [];
 };
+

@@ -299,10 +299,18 @@ export const deleteVideo = async (req, res) => {
 export const getAllClasses = async (req, res) => {
   try {
     const { id: userId } = req.params;
-    const user = await User.findById(userId);
+    const { all } = req.query; // Check for 'all' query parameter
+    
+    if (all === 'true') {
+      // Return all classes in the system
+      const allClasses = await Class.find({});
+      return res.json(allClasses);
+    }
+    
+    // Return user's classes (existing behavior)
+    const user = await User.findById(userId).populate('classes');
     if (!user) return res.status(404).json({ message: "User not found" });
-    const classes = await fetchAllClasses(user.classes);
-    res.json(classes);
+    res.json(user.classes);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -406,5 +414,46 @@ export const getAllVideosForClass = async (req, res) => {
     res.json(videos);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+// join a class and link to user
+export const joinClass = async (req, res) => {
+  try {
+    const { id: userId, classId } = req.params;
+    
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    // Check if class exists
+    const classExists = await Class.findById(classId);
+    if (!classExists) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+    
+    // Check if user is already in this class
+    const isAlreadyJoined = user.classes.some(cls => cls.toString() === classId);
+    if (isAlreadyJoined) {
+      return res.status(400).json({ message: "Already joined this class" });
+    }
+    
+    // Add class to user's classes
+    await User.findByIdAndUpdate(
+      userId, 
+      { $push: { classes: classId } },
+      { new: true }
+    );
+    
+    res.status(200).json({ 
+      message: "Successfully joined class", 
+      class: classExists 
+    });
+    
+  } catch (err) {
+    console.error("Join class error:", err);
+    res.status(500).json({ message: "Internal server error: " + err.message });
   }
 };

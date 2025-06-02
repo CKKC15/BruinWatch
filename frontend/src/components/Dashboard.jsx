@@ -7,13 +7,13 @@ import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [cards, setCards] = useState([]);
-
+  const [availableClasses, setAvailableClasses] = useState([]);
+  const [selectedClass, setSelectedClass] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     professor: '',
-    term: '',
-    color: '#cccccc'
+    term: ''
   });
 
   const user = JSON.parse(localStorage.getItem('user'));
@@ -65,28 +65,57 @@ const Dashboard = () => {
   }, []);
   
 
-  const handleCreate = async () => {
+  const fetchAllClasses = async () => {
     try {
-      const res = await axios.post(`${backendUrl}/users/${userId}/create_class`, {
-        name: formData.name,
-        professor: formData.professor,
-        term: formData.term,
-        color: formData.color
-      },
-      {
+      const res = await axios.get(`${backendUrl}/users/${userId}/get_classes?all=true`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
-      }
-    );
-  
-      // Instead of manually adding to cards, trigger refetch
+      });
+      setAvailableClasses(res.data);
+    } catch (err) {
+      console.error('Error fetching available classes:', err);
+    }
+  };
+
+  const handleOpenModal = () => {
+    setShowForm(true);
+    fetchAllClasses(); // Fetch classes when modal opens
+  };
+
+  const handleClassSelect = (classId) => {
+    const selected = availableClasses.find(cls => cls._id === classId);
+    setSelectedClass(selected);
+    if (selected) {
+      setFormData({
+        name: selected.name,
+        professor: selected.professor,
+        term: selected.term
+      });
+    }
+  };
+
+  const handleJoin = async () => {
+    if (!selectedClass) {
+      alert('Please select a class to join');
+      return;
+    }
+
+    try {
+      const res = await axios.post(`${backendUrl}/users/${userId}/join/${selectedClass._id}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      // Trigger refetch of user's classes
       setReloadFlag(prev => !prev);
-      setFormData({ name: '', professor: '', term: '', color: '#cccccc' });
+      setFormData({ name: '', professor: '', term: '' });
+      setSelectedClass(null);
       setShowForm(false);
     } catch (err) {
-      console.error('Error creating class:', err.response?.data || err.message);
-      alert('Failed to create class. Please try again.');
+      console.error('Error joining class:', err.response?.data || err.message);
+      alert('Failed to join class. Please try again.');
     }
   };
 
@@ -176,41 +205,63 @@ const Dashboard = () => {
       </div>
     ))}
 
-        <div className="dashboard-card add-card" onClick={() => setShowForm(true)}>
-          <p>+ Add Class</p>
+        <div className="dashboard-card add-card" onClick={handleOpenModal}>
+          <p>+ Join Class</p>
         </div>
       </div>
       {showForm && (
         <div className="modal">
           <div className="modal-content">
-            <h2>Add a Class</h2>
-            <input
-              type="text"
-              placeholder="Class Name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="Professor"
-              value={formData.professor}
-              onChange={(e) => setFormData({ ...formData, professor: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="Term (e.g. Fall 2025)"
-              value={formData.term}
-              onChange={(e) => setFormData({ ...formData, term: e.target.value })}
-            />
-            <label>Color</label>
-            <input
-              type="color"
-              value={formData.color}
-              onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-            />
+            <h2>Join a Class</h2>
+            
+            <label>Select Class</label>
+            <select
+              value={selectedClass?._id || ''}
+              onChange={(e) => handleClassSelect(e.target.value)}
+              style={{
+                padding: '8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                fontSize: '14px'
+              }}
+            >
+              <option value="">Choose a class...</option>
+              {availableClasses.map(cls => (
+                <option key={cls._id} value={cls._id}>
+                  {cls.name}
+                </option>
+              ))}
+            </select>
+
+            {selectedClass && (
+              <>
+                <label>Professor</label>
+                <input
+                  type="text"
+                  value={formData.professor}
+                  readOnly
+                  style={{
+                    backgroundColor: '#f5f5f5',
+                    cursor: 'not-allowed'
+                  }}
+                />
+                
+                <label>Term</label>
+                <input
+                  type="text"
+                  value={formData.term}
+                  readOnly
+                  style={{
+                    backgroundColor: '#f5f5f5',
+                    cursor: 'not-allowed'
+                  }}
+                />
+              </>
+            )}
+            
             <div className="modal-buttons">
-              <button onClick={handleCreate}>Create</button>
-              <button onClick={() => setShowForm(false)}>Cancel</button>
+              <button className="cancel-button" onClick={() => setShowForm(false)}>Cancel</button>
+              <button className="join-button" onClick={handleJoin}>Join</button>
             </div>
           </div>
         </div>

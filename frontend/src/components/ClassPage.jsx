@@ -2,6 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './ClassPage.css';
 
+function formatTimestamp(seconds) {
+  if (seconds === undefined || seconds === null || isNaN(seconds)) return "00:00";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  if (h > 0) {
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  } else {
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+}
+
 const ClassPage = () => {
   const [classData, setClassData] = useState(null);
   const [videos, setVideos] = useState([]);
@@ -169,7 +181,7 @@ const ClassPage = () => {
                         });
                       }}
                     >
-                      {segment.text} ({Math.floor(segment.start)}s)
+                      {segment.text} ({formatTimestamp(segment.start)})
                     </button>
                     </span>
                   </li>
