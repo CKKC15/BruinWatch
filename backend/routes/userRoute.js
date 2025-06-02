@@ -36,7 +36,7 @@ router.get('/:id/videos', auth, getAllVideos);
 router.get('/:id/videos/:videoId', auth, getVideoById);
 router.put('/:id/videos/:videoId', auth, updateVideo);
 router.delete('/:id/videos/:videoId', auth, deleteVideo);
-router.get('/:id/videos/search/:className', findKeywordInVideo);
+router.get('/:id/videos/search/:className', auth, findKeywordInVideo);
 
 // video routes moved to videoRoute.js
 

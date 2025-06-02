@@ -99,3 +99,66 @@
   object-fit: cover;
 }
 
+.class-page-search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  gap: 10px;
+}
+
+.class-page-search input[type="text"] {
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 300px;
+  transition: border-color 0.2s ease;
+}
+
+.class-page-search input[type="text"]:focus {
+  border-color: #333;
+  outline: none;
+}
+
+.class-page-search button {
+  padding: 10px 16px;
+  font-size: 16px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.class-page-search button:hover {
+  background-color: #4e4d4d;
+}
+
+.matched-segments {
+  margin-top: 8px;
+}
+
+.matched-segments ul {
+  max-height: 120px;
+  overflow-y: auto;
+  padding-left: 16px;
+  margin: 4px 0;
+}
+
+.timestamp-button {
+  background: none;
+  border: none;
+  vertical-align: top; /* aligns with top of line box */
+  color: #007bff;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  text-align: left;
+}
+
+.timestamp-button:hover {
+  text-decoration: underline;
+}
+

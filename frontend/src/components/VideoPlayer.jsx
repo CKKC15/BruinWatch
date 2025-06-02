@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ReactPlayer from "react-player";
 import './VideoPlayer.css';
 import { io } from "socket.io-client"
@@ -80,6 +80,7 @@ export default function VideoPlayer() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('transcript');
   const playerRef = useRef(null);
+  const location = useLocation();
   
   // Chatbot states
   const [messages, setMessages] = useState([]);
@@ -120,6 +121,12 @@ export default function VideoPlayer() {
         console.log('Video data:', data); // Debug log
         console.log('Transcript data:', data.transcript); // Debug log
         setVideo(data);
+
+        // Seek to startTime after video data is loaded
+        const startTime = location.state?.startTime;
+        if (startTime !== undefined && startTime !== null) {
+          seekToTime(startTime);
+        }
       } catch (err) {
         setError('Failed to load video. Please try again.');
         console.error('Error fetching video:', err);
