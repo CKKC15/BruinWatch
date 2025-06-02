@@ -303,7 +303,14 @@ export const deleteClass = async (req, res) => {
 // fetch all class names for a user
 export const getAllClassNames = async (req, res) => {
   try {
-    const classNames = await fetchAllClassesNames();
+    const { id: userId } = req.params;
+    const user = await User.findById(userId).populate('classes', 'name');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    const classNames = user.classes.map(cls => cls.name);
     res.json(classNames);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -316,6 +323,22 @@ export const getAllVideosForClass = async (req, res) => {
     const { classId } = req.params;
     const videos = await fetchAllVideosFromClass(classId);
     res.json(videos);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getUserClassNames = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).populate('classes', 'name');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    const classNames = user.classes.map(cls => cls.name);
+    res.json(classNames);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

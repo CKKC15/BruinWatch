@@ -117,37 +117,33 @@ const AddVideo = () => {
   };
 
   useEffect(() => {
-    const fetchClassNames = async () => {
+    const fetchClasses = async () => {
       setClassLoading(true);
       try {
         const token = localStorage.getItem('token');
         const userJson = localStorage.getItem('user');
-        const userId = JSON.parse(userJson).id
-        
-        if (!token || !userJson) return;
+        const userId = JSON.parse(userJson).id;
         
         const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/classnames`, {
-          method: 'GET',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           }
         });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch class names: ${response.status}`);
+        
+        if (response.ok) {
+          const classNames = await response.json();
+          setAvailableClasses(classNames);
+        } else {
+          console.error('Failed to fetch class names');
         }
-
-        const data = await response.json();
-        setAvailableClasses(data);
-      } catch (err) {
-        setAvailableClasses([]);
+      } catch (error) {
+        console.error('Error fetching class names:', error);
       } finally {
         setClassLoading(false);
       }
     };
 
-    fetchClassNames();
+    fetchClasses();
   }, []);
 
   const handleDateChange = (date) => {

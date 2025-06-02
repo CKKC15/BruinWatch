@@ -182,7 +182,7 @@ export default function VideoPlayer() {
   if (error) return <div className="video-player-error">Error: {error}</div>;
   if (!video) return <div className="video-player-error">Video not found</div>;
 
-  return (
+        return (
     <div className="page-container">
       <div className="video-section">
         <div className="video-container">
@@ -192,35 +192,35 @@ export default function VideoPlayer() {
           </video>
         </div>
       </div>
-      <div className="tabs-container">
-        <div className="bloc-tabs">
+                <div className="tabs-container">
+                    <div className="bloc-tabs">
           <button
             className={activeTab === 'transcript' ? 'tabs active-tabs' : 'tabs'}
             onClick={() => setActiveTab('transcript')}
           >
-            Transcript
-          </button>
+                            Transcript
+                        </button>
           <button
             className={activeTab === 'chatbot' ? 'tabs active-tabs' : 'tabs'}
             onClick={() => setActiveTab('chatbot')}
           >
-            Chatbot
-          </button>
+                            Chatbot
+                        </button>
           <button
             className={activeTab === 'chat' ? 'tabs active-tabs' : 'tabs'}
             onClick={() => setActiveTab('chat')}
           >
-            Chat
-          </button>
-        </div>
-        <div className="content-tabs">
+                            Chat
+                        </button>
+                    </div>
+                    <div className="content-tabs">
           <div className={activeTab === 'transcript' ? 'content active-content' : 'content'}>
-            <div className="transcript-container">
-              <div className="transcript-content">
+                            <div className="transcript-container">
+                                    <div className="transcript-content">
                 {video.transcript?.segments?.map((segment, idx) => (
                   <div
                     key={idx}
-                    className="transcript-entry"
+                                                  className="transcript-entry"
                     onClick={() => seekToTime(segment.start)}
                     style={{ cursor: "pointer" }}
                   >
@@ -230,7 +230,7 @@ export default function VideoPlayer() {
                 ))}
               </div>
             </div>
-          </div>
+                                                </div>
           <div className={activeTab === 'chatbot' ? 'content active-content' : 'content'}>
             <div className="content-area">
               <h3>Ask about this video</h3>
@@ -239,7 +239,7 @@ export default function VideoPlayer() {
                   {messages.length === 0 && (
                     <div className="empty-chat">
                       <p>Ask me anything about this video!</p>
-                    </div>
+                                    </div>
                   )}
                   {messages.map((message, index) => (
                     <div key={index} className={`message ${message.type}`}>
@@ -248,8 +248,8 @@ export default function VideoPlayer() {
                           ? renderMessageWithTimestamps(message.content, seekToTime)
                           : message.content
                         }
-                      </div>
-                    </div>
+                            </div>
+                        </div>
                   ))}
                   {chatLoading && (
                     <div className="message bot">
@@ -259,12 +259,12 @@ export default function VideoPlayer() {
                           <span></span>
                           <span></span>
                         </div>
-                      </div>
+                        </div>
                     </div>
                   )}
                   <div ref={messagesEndRef} />
                 </div>
-              </div>
+            </div>
               <div className="chat-input-container">
                 <div className="chat-input-wrapper">
                   <textarea
@@ -295,14 +295,14 @@ export default function VideoPlayer() {
                     ↑
                   </button>
                 </div>
-              </div>
+                </div>
             </div>
           </div>
           <div className={activeTab === 'chat' ? 'content active-content' : 'content'}>
             <div className="chat-container">
               <p>Chat functionality coming soon...</p>
             </div>
-          </div>
+            </div>
         </div>
       </div>
     </div>
