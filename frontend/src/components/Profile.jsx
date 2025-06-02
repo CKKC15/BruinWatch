@@ -82,7 +82,7 @@ const Profile = () => {
               type="password"
               name="password"
               placeholder="passwordis1234"
-              value={password}
+              value={user.password}
               onChange={handleInputChange}
             />
           </label>
