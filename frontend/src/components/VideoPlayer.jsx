@@ -4,7 +4,6 @@ import ReactPlayer from "react-player";
 import './VideoPlayer.css';
 import { io } from "socket.io-client"
 import Chat from './Chat';
-// const socket = io.connect("http://localhost:5001")
 
 function formatTimestamp(seconds) {
   if (seconds === undefined || seconds === null || isNaN(seconds)) return "00:00";
@@ -307,10 +306,8 @@ export default function VideoPlayer() {
             </div>
           </div>
           <div className={activeTab === 'chat' ? 'content active-content' : 'content'}>
-            <div className="chat-container">
-              <Chat />
-            </div>
-            </div>
+            <Chat />
+          </div>
         </div>
       </div>
     </div>
