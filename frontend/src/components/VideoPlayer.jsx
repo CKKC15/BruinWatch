@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import ReactPlayer from "react-player";
 import './VideoPlayer.css';
 import { io } from "socket.io-client"
+import Chat from './Chat';
 // const socket = io.connect("http://localhost:5001")
 
 function formatTimestamp(seconds) {
@@ -300,7 +301,7 @@ export default function VideoPlayer() {
           </div>
           <div className={activeTab === 'chat' ? 'content active-content' : 'content'}>
             <div className="chat-container">
-              <p>Chat functionality coming soon...</p>
+              <Chat />
             </div>
           </div>
         </div>
