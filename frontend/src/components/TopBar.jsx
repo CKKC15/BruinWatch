@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TopBar.css';
+import logo from "/bruinwatch_logo.svg";
 
 const TopBar = () => {
   const [user, setUser] = useState(null);
@@ -66,7 +67,9 @@ const TopBar = () => {
     <div className="topbar">
       <div className="topbar-content">
         <div className="topbar-logo-container">
-          <div className="topbar-logo" />
+          <div className="topbar-logo">
+            <img src={logo} alt="BruinWatch Logo" className="topbar-logo" />
+          </div>
           <h1 className="topbar-title">BruinWatch</h1>
         </div>
         

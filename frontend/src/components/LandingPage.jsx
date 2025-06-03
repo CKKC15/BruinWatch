@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
+import logo from "/bruinwatch_logo.svg";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const LandingPage = () => {
     <div className="landing-container">
       <div className="landing-left">
         <div className="logo-container">
-          <div className="logo">B</div>
+          <img src={logo} alt="BruinWatch Logo" className="logo-image" />
         </div>
         <h1 className="brand-name">BruinWatch</h1>
         <p className="tagline">
