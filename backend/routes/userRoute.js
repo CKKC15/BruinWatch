@@ -26,14 +26,14 @@ router.get('/:id/get_classes', auth, getAllClasses);
 router.get('/:id/classes/:classId', auth, getClassById);
 router.put('/:id/classes/:classId', auth, updateClass);
 router.delete('/:id/delete_class/:classId', auth, deleteClass);
-router.get('/:id/classes/:classId/videos', auth, getAllVideosForClass);
+router.get('/:id/classes/:classId/videos', getAllVideosForClass);
 router.get('/:id/classnames', auth, getAllClassNames);
 router.post('/:id/join/:classId', auth, joinClass);
 
 // video routes under user
 router.post('/:id/videos', auth, upload.single('file'), createVideo);
 router.get('/:id/videos', auth, getAllVideos);
-router.get('/:id/videos/:videoId', auth, getVideoById);
+router.get('/:id/videos/:videoId', getVideoById);
 router.put('/:id/videos/:videoId', auth, updateVideo);
 router.delete('/:id/videos/:videoId', auth, deleteVideo);
 router.get('/:id/videos/search/:className', auth, findKeywordInVideo);

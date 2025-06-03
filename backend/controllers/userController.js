@@ -2,7 +2,6 @@
 
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import User from "../models/user.js";
 import Class from "../models/class.js";
 import Video from "../models/video.js";
@@ -260,9 +259,14 @@ export const createVideo = async (req, res) => {
 // fetch single video
 export const getVideoById = async (req, res) => {
   try {
-    const { id: userId, videoId } = req.params;
-    const video = await fetchVideoById(userId, videoId);
-    if (!video) return res.status(404).json({ message: "Video not found" });
+    const { videoId } = req.params;
+    
+    // Simply find the video by ID, no user ownership check
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(404).json({ message: "Video not found" });
+    }
+    
     res.json(video);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -410,8 +414,15 @@ export const getAllClassNames = async (req, res) => {
 export const getAllVideosForClass = async (req, res) => {
   try {
     const { classId } = req.params;
-    const videos = await fetchAllVideosFromClass(classId);
-    res.json(videos);
+    
+    // Find the class and populate with full video details
+    const classData = await Class.findById(classId).populate('videos');
+    if (!classData) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+    
+    // Return the full video objects
+    res.json(classData.videos);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
