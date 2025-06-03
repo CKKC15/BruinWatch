@@ -9,7 +9,7 @@ export default function Chat() {
   const [room, setRoom] = useState("");
 
   useEffect(() => {
-    socket.current = io("http://localhost:3000");
+    socket.current = io("http://localhost:5000");
 
     const handleMessage = (data) => {
       setChat((prevChat) => prevChat + `${data.sender}: ${data.message}\n`);

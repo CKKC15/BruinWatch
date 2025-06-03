@@ -8,7 +8,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 
 const app = express();
-const port = 3000; // single port for both HTTP + WebSocket
+const port = 5000; // single port for both HTTP + WebSocket
 
 // middleware
 app.use(express.json());
