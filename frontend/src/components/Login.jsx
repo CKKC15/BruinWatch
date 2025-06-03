@@ -180,6 +180,18 @@ const Login = () => {
             </div>
           )}
           
+          {errors.general && (
+            <div className="error-text">
+              {errors.general}
+            </div>
+          )}
+          
+          {errors.auth && (
+            <div className="error-text">
+              {errors.auth}
+            </div>
+          )}
+          
           <div className="form-field">
             <label htmlFor="email">Email</label>
             <input
@@ -190,7 +202,11 @@ const Login = () => {
               onChange={handleChange}
               placeholder="email"
             />
-            {errors.email && <div className="error-message">{errors.email}</div>}
+            {errors.email && (
+              <div className="error-text">
+                {errors.email}
+              </div>
+            )}
           </div>
           
           <div className="form-field">
@@ -203,7 +219,11 @@ const Login = () => {
               onChange={handleChange}
               placeholder="password"
             />
-            {errors.password && <div className="error-message">{errors.password}</div>}
+            {errors.password && (
+              <div className="error-text">
+                {errors.password}
+              </div>
+            )}
           </div>
           
           {!isLogin && (
@@ -220,8 +240,6 @@ const Login = () => {
               {errors.confirmPassword && <div className="error-message">{errors.confirmPassword}</div>}
             </div>
           )}
-          
-          {errors.auth && <div className="error-message">{errors.auth}</div>}
           
           <button 
             type="submit" 

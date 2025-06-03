@@ -36,38 +36,25 @@ const ClassPage = () => {
           return;
         }
 
-        // Fetch class details
+        // Fetch class details (still need auth to verify user is in class)
         const classResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/classes/${classId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
 
-        // Fetch videos for the class
-        const videosResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/classes/${classId}/videos`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        // Fetch ALL videos for the class (no userId needed since auth was removed)
+        const videosResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/classes/${classId}/videos`);
 
         if (!classResponse.ok || !videosResponse.ok) {
           throw new Error('Failed to fetch data');
         }
 
         const classDetails = await classResponse.json();
-        const videoIds = await videosResponse.json();
-
-        // Fetch full details for each video
-        const videoDetailsPromises = videoIds.map(videoId => 
-          fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/videos/${videoId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }).then(res => res.json())
-        );
-
-        const videoDetails = await Promise.all(videoDetailsPromises);
+        const allVideos = await videosResponse.json(); // This should now return full video objects, not just IDs
         
         setClassData(classDetails);
-        setVideos(videoDetails);
+        setVideos(allVideos); // Directly set the videos since we get full objects
       } catch (err) {
         setError(err.message);
       } finally {
