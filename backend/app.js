@@ -33,62 +33,21 @@ const io = new Server(server, {
 });
 
 // WebSocket logic
-const activeRooms = new Map(); // Store room codes and info
-
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  // Create a new room
-  socket.on('create-room', (callback) => {
-    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const roomId = `room_${roomCode}`;
-    
-    activeRooms.set(roomCode, {
-      id: roomId,
-      creator: socket.id,
-      created: new Date(),
-      members: []
-    });
-    
-    socket.join(roomId);
-    activeRooms.get(roomCode).members.push(socket.id);
-    
-    console.log(`Room created: ${roomCode} by ${socket.id}`);
-    callback({ success: true, roomCode, roomId });
-  });
-
-  // Join existing room
-  socket.on('join-room', (roomCode, callback) => {
-    if (activeRooms.has(roomCode)) {
-      const room = activeRooms.get(roomCode);
-      socket.join(room.id);
-      room.members.push(socket.id);
-      
-      socket.to(room.id).emit('user-joined', `Someone joined the room`);
-      console.log(`Socket ${socket.id} joined room ${roomCode}`);
-      callback({ success: true, roomId: room.id });
-    } else {
-      callback({ success: false, error: 'Room not found' });
-    }
+  socket.on('join-room', (room) => {
+    socket.join(room);
+    console.log(`Socket ${socket.id} joined room ${room}`);
   });
 
   socket.on('send-message', ({ room, message, sender }) => {
     console.log(`Message from ${sender} in room ${room}: ${message}`);
-    socket.to(room).emit('receive-message', { message, sender, timestamp: Date.now() });
+    io.to(room).emit('receive-message', { message, sender });
   });
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
-    // Remove user from all rooms
-    activeRooms.forEach((room, code) => {
-      const index = room.members.indexOf(socket.id);
-      if (index > -1) {
-        room.members.splice(index, 1);
-        if (room.members.length === 0) {
-          activeRooms.delete(code);
-        }
-      }
-    });
   });
 });
 
