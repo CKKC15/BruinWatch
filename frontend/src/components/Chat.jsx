@@ -10,10 +10,19 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [username, setUsername] = useState('');
-  const [showUsernameInput, setShowUsernameInput] = useState(true);
+  const [showUsernameInput, setShowUsernameInput] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      setUsername(user.name || user.email.split('@')[0]);
+      setShowUsernameInput(false);
+    } else {
+      setShowUsernameInput(true);
+    }
+
     const newSocket = io(import.meta.env.VITE_BACKEND_URL);
     setSocket(newSocket);
 
