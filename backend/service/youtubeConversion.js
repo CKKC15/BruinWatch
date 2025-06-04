@@ -1,6 +1,12 @@
 import ytdl from 'ytdl-core';
 import youtubeDl from 'youtube-dl-exec';
 import { spawn } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get the directory of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Converts a YouTube video to MP4 format
@@ -19,8 +25,11 @@ export async function convertYouTubeToMP4(youtubeUrl) {
             const chunks = [];
             let errorOutput = '';
 
-            // Spawn yt-dlp process
-            const ytDlpProcess = spawn('yt-dlp', [
+            // Find the yt-dlp binary from the youtube-dl-exec package
+            const ytDlpPath = path.join(__dirname, '../../node_modules/youtube-dl-exec/bin/yt-dlp');
+
+            // Spawn yt-dlp process with the correct path
+            const ytDlpProcess = spawn(ytDlpPath, [
                 youtubeUrl,
                 '--format', 'best[ext=mp4]/best',
                 '--output', '-',
