@@ -1,7 +1,7 @@
 // user route
 
 import express from 'express';
-import { register, login, logout, getCurrentUser, verifyGoogle, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo, createClass, getAllClasses, getClassById, updateClass, deleteClass, getAllClassNames, getAllVideosForClass, findKeywordInVideo, joinClass, joinClassFromData } from '../controllers/userController.js';
+import { register, login, logout, getCurrentUser, verifyGoogle, updateUser, getAllVideos, createVideo, getVideoById, updateVideo, deleteVideo, createClass, getAllClasses, getClassById, updateClass, deleteClass, getAllClassNames, getAllVideosForClass, findKeywordInVideo, joinClass, joinClassFromData, debugDatabase } from '../controllers/userController.js';
 import auth from '../middleware/auth.js';
 import multer from 'multer';
 const upload = multer();
@@ -38,6 +38,9 @@ router.get('/:id/videos/:videoId', getVideoById);
 router.put('/:id/videos/:videoId', auth, updateVideo);
 router.delete('/:id/videos/:videoId', auth, deleteVideo);
 router.get('/:id/videos/search/:className', auth, findKeywordInVideo);
+
+// DEBUG: Check database contents
+router.get('/:id/debug', auth, debugDatabase);
 
 // video routes moved to videoRoute.js
 

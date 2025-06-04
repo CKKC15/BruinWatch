@@ -484,16 +484,61 @@ export const getAllClassNames = async (req, res) => {
 export const getAllVideosForClass = async (req, res) => {
   try {
     const { classId } = req.params;
+    console.log('Fetching videos for class ID:', classId);
 
     // Find the class and populate with full video details
     const classData = await Class.findById(classId).populate('videos');
     if (!classData) {
+      console.log('Class not found:', classId);
       return res.status(404).json({ message: "Class not found" });
     }
 
-    // Return the full video objects
-    res.json(classData.videos);
+    console.log('Class found:', classData.name);
+    console.log('Videos in class.videos array:', classData.videos.length);
+
+    // Try multiple approaches to find videos:
+
+    // 1. Videos directly linked to the class (via videos array)
+    let allVideos = [...classData.videos];
+
+    // 2. Videos by exact className match
+    const videosByExactName = await Video.find({ className: classData.name });
+
+    // 3. Videos by partial className match (e.g., "CS31" matches "CS31: Introduction...")
+    const classCode = classData.name.split(':')[0].trim(); // Extract "CS31" from "CS31: Introduction..."
+    const videosByPartialName = await Video.find({
+      className: { $regex: classCode, $options: 'i' }
+    });
+
+    console.log('Videos by exact className:', videosByExactName.length);
+    console.log('Videos by partial className (code):', videosByPartialName.length);
+
+    // Combine all videos and remove duplicates (based on _id)
+    const videoMap = new Map();
+
+    // Add videos from class.videos array
+    allVideos.forEach(video => {
+      videoMap.set(video._id.toString(), video);
+    });
+
+    // Add videos found by className
+    videosByExactName.forEach(video => {
+      videoMap.set(video._id.toString(), video);
+    });
+
+    // Add videos found by partial match
+    videosByPartialName.forEach(video => {
+      videoMap.set(video._id.toString(), video);
+    });
+
+    const uniqueVideos = Array.from(videoMap.values());
+
+    console.log('Total unique videos found:', uniqueVideos.length);
+    console.log('Video titles:', uniqueVideos.map(v => v.title));
+
+    res.json(uniqueVideos);
   } catch (err) {
+    console.error('Error in getAllVideosForClass:', err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -590,5 +635,58 @@ export const joinClassFromData = async (req, res) => {
   } catch (err) {
     console.error("Join class from data error:", err);
     res.status(500).json({ message: "Internal server error: " + err.message });
+  }
+};
+
+// DEBUG: endpoint to check database contents
+export const debugDatabase = async (req, res) => {
+  try {
+    const { id: userId } = req.params;
+
+    // Get user with populated classes
+    const user = await User.findById(userId).populate('classes');
+
+    // Get all videos for this user
+    const userVideos = await Video.find({ user: userId });
+
+    // Get all classes in the system
+    const allClasses = await Class.find({});
+
+    // Get all videos in the system
+    const allVideos = await Video.find({});
+
+    const debugInfo = {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        classesCount: user.classes.length,
+        videosCount: user.videos.length
+      },
+      userClasses: user.classes.map(cls => ({
+        id: cls._id,
+        name: cls.name,
+        professor: cls.professor,
+        term: cls.term,
+        videosInArray: cls.videos.length
+      })),
+      userVideos: userVideos.map(video => ({
+        id: video._id,
+        title: video.title,
+        className: video.className,
+        date: video.date
+      })),
+      systemSummary: {
+        totalClasses: allClasses.length,
+        totalVideos: allVideos.length
+      },
+      allClassNames: allClasses.map(cls => cls.name),
+      allVideoClassNames: [...new Set(allVideos.map(v => v.className))]
+    };
+
+    res.json(debugInfo);
+  } catch (err) {
+    console.error('Debug endpoint error:', err);
+    res.status(500).json({ message: err.message });
   }
 };

@@ -52,7 +52,11 @@ const ClassPage = () => {
 
         const classDetails = await classResponse.json();
         const allVideos = await videosResponse.json(); // This should now return full video objects, not just IDs
-        
+
+        console.log('Class details:', classDetails);
+        console.log('Videos received from API:', allVideos);
+        console.log('Number of videos:', allVideos.length);
+
         setClassData(classDetails);
         setVideos(allVideos); // Directly set the videos since we get full objects
       } catch (err) {
@@ -71,12 +75,12 @@ const ClassPage = () => {
 
   const handleSearch = async () => {
     if (!searchTerm.trim() || !classData?.name) return;
-  
+
     try {
       const token = localStorage.getItem('token');
       const userJson = localStorage.getItem('user');
       const userId = JSON.parse(userJson).id;
-  
+
       const className = encodeURIComponent(classData.name);  // URL-safe
       console.log(`${className}`)
       const response = await fetch(
@@ -85,21 +89,21 @@ const ClassPage = () => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-  
+
       if (!response.ok) {
         const text = await response.text();
         console.error('Backend error:', response.status, text);
         throw new Error('Failed to search videos');
       }
-  
+
       const results = await response.json();
       setSearchResults(results);
     } catch (err) {
       setError(err.message);
     }
   };
-  
-  
+
+
   if (loading) return <div className="class-page-loading">Loading...</div>;
   if (error) return <div className="class-page-error">Error: {error}</div>;
   if (!classData) return <div className="class-page-error">Class not found</div>;
@@ -114,92 +118,92 @@ const ClassPage = () => {
         </div>
       </div>
       <div className="class-page-search">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault(); // Prevent form from reloading the page
-          handleSearch();
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Search videos by keyword..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <button type="submit">Search</button>
-      </form>
-    </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault(); // Prevent form from reloading the page
+            handleSearch();
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Search videos by keyword..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button type="submit">Search</button>
+        </form>
+      </div>
 
 
       <div className="videos-grid">
-      {searchResults.length > 0
-  ? searchResults.map(({ video, matchedSegments }) => (
-      <div
-        key={video._id}
-        className="video-card"
-        onClick={() => handleVideoClick(video._id)}
-      >
-        <div className="video-preview">
-          {video.link && (
-            <video
-              src={video.link}
-              preload="metadata"
-              poster={video.thumbnail}
-            />
-          )}
-        </div>
-        <div className="video-card-content">
-          <h3>{video.title}</h3>
-          <p>{new Date(video.date).toLocaleDateString()}</p>
+        {searchResults.length > 0
+          ? searchResults.map(({ video, matchedSegments }) => (
+            <div
+              key={video._id}
+              className="video-card"
+              onClick={() => handleVideoClick(video._id)}
+            >
+              <div className="video-preview">
+                {video.link && (
+                  <video
+                    src={video.link}
+                    preload="metadata"
+                    poster={video.thumbnail}
+                  />
+                )}
+              </div>
+              <div className="video-card-content">
+                <h3>{video.title}</h3>
+                <p>{new Date(video.date).toLocaleDateString()}</p>
 
-          {matchedSegments && matchedSegments.length > 0 && (
-            <div className="matched-segments">
-              <strong>Matched Segments:</strong>
-              <ul>
-                {matchedSegments.map((segment, i) => (
-                  <li key={i}>
-                    <span>
-                    <button
-                      className="timestamp-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/videoplayer/${video._id}`, {
-                          state: { startTime: Math.floor(segment.start) }
-                        });
-                      }}
-                    >
-                      {segment.text} ({formatTimestamp(segment.start)})
-                    </button>
-                    </span>
-                  </li>
-                ))}
-              </ul>
+                {matchedSegments && matchedSegments.length > 0 && (
+                  <div className="matched-segments">
+                    <strong>Matched Segments:</strong>
+                    <ul>
+                      {matchedSegments.map((segment, i) => (
+                        <li key={i}>
+                          <span>
+                            <button
+                              className="timestamp-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/videoplayer/${video._id}`, {
+                                  state: { startTime: Math.floor(segment.start) }
+                                });
+                              }}
+                            >
+                              {segment.text} ({formatTimestamp(segment.start)})
+                            </button>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </div>
-      </div>
-    ))
-  : videos.map((video) => (
-      <div
-        key={video._id}
-        className="video-card"
-        onClick={() => handleVideoClick(video._id)}
-      >
-        <div className="video-preview">
-          {video.link && (
-            <video
-              src={video.link}
-              preload="metadata"
-              poster={video.thumbnail}
-            />
-          )}
-        </div>
-        <div className="video-card-content">
-          <h3>{video.title}</h3>
-          <p>{new Date(video.date).toLocaleDateString()}</p>
-        </div>
-      </div>
-    ))}
+          ))
+          : videos.map((video) => (
+            <div
+              key={video._id}
+              className="video-card"
+              onClick={() => handleVideoClick(video._id)}
+            >
+              <div className="video-preview">
+                {video.link && (
+                  <video
+                    src={video.link}
+                    preload="metadata"
+                    poster={video.thumbnail}
+                  />
+                )}
+              </div>
+              <div className="video-card-content">
+                <h3>{video.title}</h3>
+                <p>{new Date(video.date).toLocaleDateString()}</p>
+              </div>
+            </div>
+          ))}
 
       </div>
     </div>
