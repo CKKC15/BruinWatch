@@ -538,3 +538,57 @@ export const joinClass = async (req, res) => {
     res.status(500).json({ message: "Internal server error: " + err.message });
   }
 };
+
+// join a class by creating it from hardcoded data
+export const joinClassFromData = async (req, res) => {
+  try {
+    const { id: userId } = req.params;
+    const { code, name, professor, term } = req.body;
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if user already has a class with this code and professor and term
+    const existingClasses = await Class.find({
+      _id: { $in: user.classes }
+    });
+
+    const alreadyJoined = existingClasses.some(cls =>
+      cls.name === name && cls.professor === professor && cls.term === term
+    );
+
+    if (alreadyJoined) {
+      return res.status(400).json({ message: "Already joined this class with this professor and term" });
+    }
+
+    // Create a new class with the provided data
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+    const newClass = await createClassRecord({
+      name: `${code}: ${name}`,
+      professor,
+      term,
+      color: randomColor
+    });
+
+    // Add class to user's classes
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { classes: newClass._id } },
+      { new: true }
+    );
+
+    res.status(201).json({
+      message: "Successfully joined class",
+      class: newClass
+    });
+
+  } catch (err) {
+    console.error("Join class from data error:", err);
+    res.status(500).json({ message: "Internal server error: " + err.message });
+  }
+};

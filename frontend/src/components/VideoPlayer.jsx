@@ -33,7 +33,7 @@ function parseTimeToSeconds(timeStr) {
 function renderMessageWithTimestamps(content, onTimestampClick) {
   // Regex to match timestamps like "2:35", "1:23:45", "at 2:35", etc.
   const timestampRegex = /(\b(?:at\s+)?(\d{1,2}):(\d{2})(?::(\d{2}))?\b)/gi;
-  
+
   const parts = [];
   let lastIndex = 0;
   let match;
@@ -81,14 +81,14 @@ export default function VideoPlayer() {
   const [activeTab, setActiveTab] = useState('transcript');
   const playerRef = useRef(null);
   const location = useLocation();
-  
+
   // Chatbot states
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
-  
+
   const messagesEndRef = useRef(null);
-  
+
   // Function to seek video to specific time
   const seekToTime = (timeInSeconds) => {
     if (playerRef.current) {
@@ -150,7 +150,7 @@ export default function VideoPlayer() {
 
     const userMessage = inputMessage.trim();
     setInputMessage('');
-    
+
     setMessages(prev => [...prev, { type: 'user', content: userMessage }]);
     setChatLoading(true);
 
@@ -189,7 +189,7 @@ export default function VideoPlayer() {
   if (error) return <div className="video-player-error">Error: {error}</div>;
   if (!video) return <div className="video-player-error">Video not found</div>;
 
-        return (
+  return (
     <div className="page-container">
       <div className="video-section">
         <div className="video-container">
@@ -199,35 +199,35 @@ export default function VideoPlayer() {
           </video>
         </div>
       </div>
-                <div className="tabs-container">
-                    <div className="bloc-tabs">
+      <div className="tabs-container">
+        <div className="bloc-tabs">
           <button
             className={activeTab === 'transcript' ? 'tabs active-tabs' : 'tabs'}
             onClick={() => setActiveTab('transcript')}
           >
-                            Transcript
-                        </button>
+            Transcript
+          </button>
           <button
             className={activeTab === 'chatbot' ? 'tabs active-tabs' : 'tabs'}
             onClick={() => setActiveTab('chatbot')}
           >
-                            Chatbot
-                        </button>
+            Chatbot
+          </button>
           <button
             className={activeTab === 'chat' ? 'tabs active-tabs' : 'tabs'}
             onClick={() => setActiveTab('chat')}
           >
-                            Chat
-                        </button>
-                    </div>
-                    <div className="content-tabs">
+            Chat
+          </button>
+        </div>
+        <div className="content-tabs">
           <div className={activeTab === 'transcript' ? 'content active-content' : 'content'}>
-                            <div className="transcript-container">
-                                    <div className="transcript-content">
+            <div className="transcript-container">
+              <div className="transcript-content">
                 {video.transcript?.segments?.map((segment, idx) => (
                   <div
                     key={idx}
-                                                  className="transcript-entry"
+                    className="transcript-entry"
                     onClick={() => seekToTime(segment.start)}
                     style={{ cursor: "pointer" }}
                   >
@@ -237,7 +237,7 @@ export default function VideoPlayer() {
                 ))}
               </div>
             </div>
-                                                </div>
+          </div>
           <div className={activeTab === 'chatbot' ? 'content active-content' : 'content'}>
             <div className="content-area">
               <h3>Ask about this video</h3>
@@ -246,32 +246,65 @@ export default function VideoPlayer() {
                   {messages.length === 0 && (
                     <div className="empty-chat">
                       <p>Ask me anything about this video!</p>
-                                    </div>
+                    </div>
                   )}
                   {messages.map((message, index) => (
                     <div key={index} className={`message ${message.type}`}>
+                      {message.type === 'bot' && (
+                        <img
+                          src="/bruinwatch_logo.gif"
+                          alt="BruinWatch Bot"
+                          className="bot-profile-picture"
+                        />
+                      )}
+                      {message.type === 'user' && (
+                        <img
+                          src={(() => {
+                            const user = JSON.parse(localStorage.getItem('user') || '{}');
+                            const profileIndex = user.profilePictureIndex || 1;
+                            const profilePictures = [
+                              '/profile-pics/avatar1.png',
+                              '/profile-pics/avatar2.png',
+                              '/profile-pics/avatar3.png',
+                              '/profile-pics/avatar4.png',
+                              '/profile-pics/avatar5.png',
+                              '/profile-pics/avatar6.png'
+                            ];
+                            return profileIndex >= 1 && profileIndex <= 6
+                              ? profilePictures[profileIndex - 1]
+                              : '/pfp.png';
+                          })()}
+                          alt="User"
+                          className="user-profile-picture"
+                        />
+                      )}
                       <div className="message-content">
-                        {message.type === 'bot' 
+                        {message.type === 'bot'
                           ? renderMessageWithTimestamps(message.content, seekToTime)
                           : message.content
                         }
-                            </div>
-                        </div>
+                      </div>
+                    </div>
                   ))}
                   {chatLoading && (
                     <div className="message bot">
+                      <img
+                        src="/bruinwatch_logo.gif"
+                        alt="BruinWatch Bot"
+                        className="bot-profile-picture"
+                      />
                       <div className="message-content typing">
                         <div className="typing-indicator">
                           <span></span>
                           <span></span>
                           <span></span>
                         </div>
-                        </div>
+                      </div>
                     </div>
                   )}
                   <div ref={messagesEndRef} />
                 </div>
-            </div>
+              </div>
               <div className="chat-input-container">
                 <div className="chat-input-wrapper">
                   <textarea
@@ -294,7 +327,7 @@ export default function VideoPlayer() {
                       e.target.style.height = e.target.scrollHeight + 'px';
                     }}
                   />
-                  <button 
+                  <button
                     onClick={handleSendMessage}
                     className="send-button-inside"
                     disabled={!inputMessage.trim() || chatLoading}
@@ -302,7 +335,7 @@ export default function VideoPlayer() {
                     ↑
                   </button>
                 </div>
-                </div>
+              </div>
             </div>
           </div>
           <div className={activeTab === 'chat' ? 'content active-content' : 'content'}>

@@ -388,16 +388,38 @@
   max-width: 80%;
   background-color: var(--bg-secondary);
   color: var(--text-primary);
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .message.user {
   align-self: flex-end;
   background-color: var(--bg-primary);
   color: yellow;
+  flex-direction: row-reverse;
 }
 
 .message.bot {
   align-self: flex-start;
+}
+
+.bot-profile-picture,
+.user-profile-picture {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent-color);
+  flex-shrink: 0;
+}
+
+.bot-profile-picture {
+  border-color: #4ECDC4;
+  background-color: #f5f5f5;
+}
+
+.user-profile-picture {
+  border-color: var(--accent-color);
 }
 
 .message-content {
@@ -405,6 +427,7 @@
   border-radius: 18px;
   word-wrap: break-word;
   line-height: 1.4;
+  flex: 1;
 }
 
 .message.user .message-content {
