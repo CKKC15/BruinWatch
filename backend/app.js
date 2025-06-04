@@ -13,7 +13,7 @@ const port = 5000; // single port for both HTTP + WebSocket
 // middleware
 app.use(express.json());
 app.use(passport.initialize());
-app.use(cors({ origin: process.env.FRONTEND_URL }));
+app.use(cors({ origin: true, credentials: true }));
 
 // routes
 app.get('/', (req, res) => res.send('Hello World!'));
