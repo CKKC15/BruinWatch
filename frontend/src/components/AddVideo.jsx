@@ -6,9 +6,35 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './AddVideo.css';
 import { FaFileVideo, FaLink } from 'react-icons/fa';
 
+const normalizeYoutubeUrl = (url) => {
+  try {
+    // Add https:// if missing
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    // Add www. if missing from youtube.com
+    if (url.includes('youtube.com') && !url.includes('www.')) {
+      url = url.replace('youtube.com', 'www.youtube.com');
+    }
+
+    const urlObj = new URL(url);
+
+    // Convert youtu.be URLs to youtube.com format
+    if (urlObj.hostname === 'youtu.be') {
+      const videoId = urlObj.pathname.slice(1);
+      return `https://www.youtube.com/watch?v=${videoId}`;
+    }
+
+    return url;
+  } catch (e) {
+    return url; // Return original URL if parsing fails
+  }
+};
+
 const AddVideo = () => {
   const [lectureTitle, setLectureTitle] = useState('');
-  const [className, setClassName] = useState('');  
+  const [className, setClassName] = useState('');
   const [availableClasses, setAvailableClasses] = useState([]);
   const [classLoading, setClassLoading] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -22,6 +48,7 @@ const AddVideo = () => {
   const [error, setError] = useState('');
   const [youtubeError, setYoutubeError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [showYoutubeDetails, setShowYoutubeDetails] = useState(false);
   const navigate = useNavigate();
   const videoInputRef = useRef();
   const fileInputRef = useRef();
@@ -31,19 +58,19 @@ const AddVideo = () => {
     setFile(uploadedFile);
     setFileName(name);
     setVideoSource('file');
-    
+
     // Create object URL for preview
     if (uploadedFile) {
       const objectUrl = URL.createObjectURL(uploadedFile);
       setPreviewUrl(objectUrl);
     }
-    
+
     // Clear YouTube input if it was previously set
     if (youtubeUrl) {
       setYoutubeUrl('');
     }
   };
-  
+
   // Handler for file drop zone
   const handleFileDrop = (e) => {
     e.preventDefault();
@@ -52,12 +79,12 @@ const AddVideo = () => {
       handleFileUploaded(droppedFile, droppedFile.name);
     }
   };
-  
+
   // Handler for file browse
   const handleFileBrowse = () => {
     fileInputRef.current.click();
   };
-  
+
   // Handler for file selection via input
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
@@ -65,55 +92,58 @@ const AddVideo = () => {
       handleFileUploaded(selectedFile, selectedFile.name);
     }
   };
-  
+
   // Handler for YouTube URL input with auto-processing
   const handleYoutubeUrlChange = (e) => {
     const value = e.target.value;
     setYoutubeUrl(value);
     setYoutubeError('');
-    
+
     // If value is empty, clear the preview
     if (!value) {
       setVideoSource(null);
       setPreviewUrl('');
       return;
     }
-    
-    // Auto-process URL after a short delay
-    // Basic YouTube URL validation
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})$/;
-    
-    if (youtubeRegex.test(value)) {
-      processYoutubeUrl(value);
-    } else {
-      // If not a valid URL format, clear the preview
-      setVideoSource(null);
-      setPreviewUrl('');
+
+    const normalizedUrl = normalizeYoutubeUrl(value);
+
+    // YouTube URL validation regex patterns
+    const patterns = [
+      /^https?:\/\/(?:www\.)?youtube\.com\/watch\?(?:.*&)?v=([a-zA-Z0-9_-]{11})(?:&.*)?$/,
+      /^https?:\/\/(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})(?:\?.*)?$/
+    ];
+
+    let isValid = false;
+    let videoId = '';
+
+    for (const pattern of patterns) {
+      const match = normalizedUrl.match(pattern);
+      if (match) {
+        isValid = true;
+        videoId = match[1];
+        break;
+      }
     }
-  };
-  
-  // Function to process YouTube URL
-  const processYoutubeUrl = (url) => {
-    // Extract video ID
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    if (match && match[1]) {
-      const videoId = match[1];
-      // Set as video source
+
+    if (isValid) {
       setVideoSource('youtube');
+      setYoutubeUrl(normalizedUrl); // Use the normalized URL
       setPreviewUrl(`https://www.youtube.com/embed/${videoId}`);
-      
       // Clear file upload if it was previously set
       if (file) {
         setFile(null);
         setFileName('');
       }
     } else {
-      setYoutubeError('Could not extract video ID from URL');
+      setVideoSource(null);
+      setPreviewUrl('');
+      setYoutubeError('Invalid YouTube URL. Please enter a valid YouTube video URL.');
     }
   };
-  
-    const handleClassNameSelect = (name) => {
-      setClassName(name);
+
+  const handleClassNameSelect = (name) => {
+    setClassName(name);
   };
 
   useEffect(() => {
@@ -123,13 +153,13 @@ const AddVideo = () => {
         const token = localStorage.getItem('token');
         const userJson = localStorage.getItem('user');
         const userId = JSON.parse(userJson).id;
-        
+
         const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/classnames`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         if (response.ok) {
           const classNames = await response.json();
           setAvailableClasses(classNames);
@@ -166,7 +196,7 @@ const AddVideo = () => {
 
     try {
       const user = JSON.parse(localStorage.getItem('user'));
-      const token = localStorage.getItem('token');        
+      const token = localStorage.getItem('token');
       const userId = user.id;
 
       if (!token) {
@@ -174,17 +204,16 @@ const AddVideo = () => {
       }
 
       const formData = new FormData();
-      
+
       // Add common fields
       formData.append('title', lectureTitle);
       formData.append('className', className);
       formData.append('date', date.toISOString());
-      
+
+      // Add either file or YouTube URL
       if (file) {
-        // For file uploads - field name must be 'file' to match backend expectation
         formData.append('file', file);
       } else if (youtubeUrl) {
-        // For YouTube URLs
         formData.append('youtubeUrl', youtubeUrl);
       }
 
@@ -195,33 +224,32 @@ const AddVideo = () => {
           'Authorization': `Bearer ${token}`
         },
         body: formData,
-        // We'll use this to track upload progress in the future if needed
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to upload video');
       }
 
       setStatus('Processing video (this may take a few minutes)...');
-      
-      // If you want to show more detailed progress, you could use Server-Sent Events (SSE)
-      // or WebSockets. For now, we'll just show a generic processing message.
-      
       const data = await response.json();
       setStatus('Processing complete! Redirecting...');
-      
-      // Navigate to the video player with the new video ID
+
       setTimeout(() => {
         navigate(`/videoplayer/${data.videoId || data._id}`);
       }, 1000);
-      
+
     } catch (err) {
       setError('Failed to save video: ' + (err.message || 'Unknown error'));
       console.error('Error saving video:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleContinueWithYoutube = () => {
+    setShowYoutubeDetails(true);
+    setVideoSource('youtube_details');
   };
 
   // Cleanup object URLs on unmount
@@ -238,12 +266,12 @@ const AddVideo = () => {
       <div className="add-video-content">
         {/* Left Column */}
         <div className="upload-section">
-          {videoSource === 'youtube' ? (
-            // Show video details when YouTube URL is processed
+          {videoSource === 'youtube_details' ? (
+            // Show video details for YouTube video
             <div className="video-details-section">
               <h2>Video Details</h2>
               <p>Enter information about your YouTube video</p>
-            
+
               <div className="form-group">
                 <label>Lecture Title</label>
                 <input
@@ -255,7 +283,7 @@ const AddVideo = () => {
                   disabled={loading}
                 />
               </div>
-            
+
               <div className="form-group">
                 <label>Class Name</label>
                 {classLoading ? (
@@ -278,7 +306,7 @@ const AddVideo = () => {
                   <p>No available classes. Please create a class first.</p>
                 )}
               </div>
-              
+
               <div className="form-group calendar-container">
                 <label>Date</label>
                 <div className="calendar-wrapper">
@@ -291,13 +319,13 @@ const AddVideo = () => {
                   />
                 </div>
               </div>
-              
+
               {error && <div className="error-message">{error}</div>}
               {status && <div className="status-message">{status}</div>}
-              {success && <div className="success-message">Video saved successfully! Redirecting to video player...</div>}
-              
-              <button 
-                onClick={handleSave} 
+              {success && <div className="success-message">Video uploaded successfully! Redirecting...</div>}
+
+              <button
+                onClick={handleSave}
                 className="save-button"
                 disabled={loading}
               >
@@ -308,8 +336,8 @@ const AddVideo = () => {
             // Show file upload UI
             <div className="file-upload-section">
               <h2>Upload Video File</h2>
-              
-              <div 
+
+              <div
                 className={`dropzone ${previewUrl && videoSource === 'file' ? 'with-video' : ''}`}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleFileDrop}
@@ -319,20 +347,20 @@ const AddVideo = () => {
                   <FaFileVideo className="dropzone-icon" />
                   <p>Drag & Drop or</p>
                   <button className="browse-button">Browse Files</button>
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    onChange={handleFileSelect} 
-                    accept="video/*" 
-                    className="file-input-hidden" 
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    accept="video/*"
+                    className="file-input-hidden"
                   />
                 </div>
-                
+
                 {previewUrl && videoSource === 'file' && (
                   <div className="inline-video-preview">
-                    <video 
-                      src={previewUrl} 
-                      controls 
+                    <video
+                      src={previewUrl}
+                      controls
                     ></video>
                   </div>
                 )}
@@ -340,7 +368,7 @@ const AddVideo = () => {
             </div>
           )}
         </div>
-        
+
         {/* Right Column */}
         <div className="form-section">
           {videoSource === 'file' ? (
@@ -348,7 +376,7 @@ const AddVideo = () => {
             <div className="video-details-section">
               <h2>Video Details</h2>
               <p>Enter information about your uploaded video</p>
-              
+
               <div className="form-group">
                 <label>Lecture Title</label>
                 <input
@@ -360,7 +388,7 @@ const AddVideo = () => {
                   disabled={loading}
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Class Name</label>
                 {classLoading ? (
@@ -383,7 +411,7 @@ const AddVideo = () => {
                   <p>No available classes. Please create a class first.</p>
                 )}
               </div>
-              
+
               <div className="form-group calendar-container">
                 <label>Date</label>
                 <div className="calendar-wrapper">
@@ -396,25 +424,40 @@ const AddVideo = () => {
                   />
                 </div>
               </div>
-              
+
               {error && <div className="error-message">{error}</div>}
               {status && <div className="status-message">{status}</div>}
               {success && <div className="success-message">Video uploaded successfully! Redirecting...</div>}
-              
-              <button 
-                onClick={handleSave} 
+
+              <button
+                onClick={handleSave}
                 className="save-button"
                 disabled={loading}
               >
                 {loading ? 'Saving...' : 'Save Video'}
               </button>
             </div>
+          ) : videoSource === 'youtube_details' ? (
+            // Show YouTube preview when in details mode
+            <div className="youtube-section">
+              <h2>YouTube Video Preview</h2>
+              <div className="youtube-input-container">
+                <div className="youtube-preview">
+                  <iframe
+                    src={previewUrl}
+                    title="YouTube video preview"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+            </div>
           ) : (
             // Show YouTube link input
             <div className="youtube-section">
               <h2>Upload Youtube Link</h2>
-              
-              <div className={`youtube-input-container ${previewUrl && videoSource === 'youtube' ? 'youtube-container-expanded' : ''}`}>
+              <div className="youtube-input-container">
                 <div className="youtube-input-wrapper">
                   <FaLink className="youtube-icon" />
                   <p>Paste URL</p>
@@ -424,21 +467,28 @@ const AddVideo = () => {
                       placeholder="youtube.com"
                       value={youtubeUrl}
                       onChange={handleYoutubeUrlChange}
-                      className="youtube-url-input"
+                      className={`youtube-url-input ${youtubeError ? 'error' : ''}`}
                     />
                   </div>
                   {youtubeError && <div className="youtube-error">{youtubeError}</div>}
                 </div>
-                
+
                 {previewUrl && videoSource === 'youtube' && (
-                  <div className="inline-video-preview">
-                    <iframe 
-                      src={previewUrl} 
-                      title="YouTube video player" 
-                      frameBorder="0" 
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  <div className="youtube-preview">
+                    <iframe
+                      src={previewUrl}
+                      title="YouTube video preview"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     ></iframe>
+                    <button
+                      onClick={handleContinueWithYoutube}
+                      className="save-button"
+                      disabled={loading || !youtubeUrl}
+                    >
+                      {loading ? 'Processing...' : 'Continue with this video'}
+                    </button>
                   </div>
                 )}
               </div>

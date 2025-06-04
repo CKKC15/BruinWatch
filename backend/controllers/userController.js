@@ -28,6 +28,8 @@ import {
 } from "./classController.js";
 import { transcribeMedia } from "../service/transcript.js";
 import { createEmbeddings } from "../service/embedding.js";
+import ytdl from "ytdl-core";
+import { convertYouTubeToMP4 } from "../service/youtubeConversion.js";
 
 // register and login user
 export const register = async (req, res) => {
@@ -225,6 +227,12 @@ export const findKeywordInVideo = async (req, res) => {
 // create a new video and link to user and class
 export const createVideo = async (req, res) => {
   try {
+    console.log('Creating video with data:', {
+      ...req.body,
+      hasFile: !!req.file,
+      userId: req.params.id
+    });
+
     const { title, className, date, youtubeUrl } = req.body;
     const { id: userId } = req.params;
 
@@ -243,18 +251,48 @@ export const createVideo = async (req, res) => {
     let embeddings;
 
     if (youtubeUrl) {
-      // Handle YouTube URL
-      videoUrl = youtubeUrl;
-      // For YouTube videos, we'll set a placeholder transcript
-      transcript = { fullText: "YouTube video - transcript not available", segments: [] };
-      embeddings = [];
+      console.log('Processing YouTube video:', youtubeUrl);
+
+      // Validate YouTube URL
+      if (!ytdl.validateURL(youtubeUrl)) {
+        console.log('Invalid YouTube URL:', youtubeUrl);
+        return res.status(400).json({ message: "Invalid YouTube URL" });
+      }
+
+      try {
+        // Download YouTube video and convert to MP4 buffer
+        console.log('Starting YouTube video download and conversion');
+        const videoBuffer = await convertYouTubeToMP4(youtubeUrl);
+        console.log('Video conversion completed, buffer size:', videoBuffer.length);
+
+        // Create a file object that matches the structure of uploaded files
+        const fakeFile = {
+          buffer: videoBuffer,
+          originalname: `video_${Date.now()}.mp4`,
+          mimetype: 'video/mp4'
+        };
+
+        // Process the video the same way as a direct upload
+        console.log('Uploading video to S3');
+        videoUrl = await uploadFileToS3(fakeFile, "videos");
+        console.log('Video uploaded to S3:', videoUrl);
+        transcript = await transcribeMedia(videoBuffer);
+        embeddings = await createEmbeddings(transcript.segments);
+        console.log('Video processing completed');
+      } catch (error) {
+        console.error("Error processing YouTube video:", error);
+        return res.status(500).json({ message: "Failed to process YouTube video", details: error.message });
+      }
     } else {
-      // Handle file upload
+      // Handle direct file upload
+      console.log('Processing uploaded file');
       videoUrl = await uploadFileToS3(req.file, "videos");
       transcript = await transcribeMedia(req.file.buffer);
       embeddings = await createEmbeddings(transcript.segments);
+      console.log('File processing completed');
     }
 
+    console.log('Creating video record');
     // Create video record with transcript
     const video = await createVideoRecord({
       title,
@@ -263,10 +301,10 @@ export const createVideo = async (req, res) => {
       embeddings,
       userId,
       className,
-      date,
-      isYoutubeVideo: !!youtubeUrl
+      date
     });
 
+    console.log('Linking video to user and class');
     // Link video to user
     await User.findByIdAndUpdate(userId, {
       $push: { videos: video._id },
@@ -277,10 +315,14 @@ export const createVideo = async (req, res) => {
       $push: { videos: video._id },
     });
 
+    console.log('Video creation completed successfully');
     res.status(201).json(video);
   } catch (err) {
     console.error("Error in createVideo:", err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 };
 

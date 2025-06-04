@@ -1,5 +1,6 @@
-  import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import './VideoInput.css';
+import { FaFileVideo } from 'react-icons/fa';
 
 const VideoInput = forwardRef(({ onFileUploaded }, ref) => {
   const [source, setSource] = useState('');
@@ -22,7 +23,7 @@ const VideoInput = forwardRef(({ onFileUploaded }, ref) => {
       setSource(file.name);
       setIsUploading(true);
       setError('');
-      
+
       // Simulate upload process
       try {
         // For a real implementation, you might want to do pre-processing here
@@ -44,15 +45,15 @@ const VideoInput = forwardRef(({ onFileUploaded }, ref) => {
   return (
     <div className="video-input-container">
       <div className="upload-box" onClick={() => document.getElementById('video-upload').click()}>
-        <input 
-          type="file" 
-          id="video-upload" 
+        <input
+          type="file"
+          id="video-upload"
           className="file-input"
           accept="video/*"
           onChange={handleFileChange}
         />
         <label htmlFor="video-upload" className="upload-label">
-          <span className="upload-icon">+</span>
+          <FaFileVideo className="upload-icon" />
           <span>Select a video file to upload</span>
         </label>
 
