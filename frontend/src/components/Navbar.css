@@ -84,16 +84,19 @@
 }
 
 .nav-icons a.active {
-  background: var(--accent-color);
-}
-
-.nav-icons a.active .nav-icon,
-.nav-icons a:hover .nav-icon {
-  color: white;
+  background: var(--bg-secondary);
 }
 
 .nav-icons a:hover:not(.active) {
-  background: var(--accent-color);
+  background: var(--bg-secondary);
+}
+
+.nav-icons a.active .nav-icon {
+  color: var(--text-primary);
+}
+
+.nav-icons a:hover .nav-icon {
+  color: var(--text-primary);
 }
 
 main {
@@ -113,21 +116,12 @@ main {
   padding: 10px 0;
 }
 
-.theme-toggle {
-  background: none;
-  border: none;
-  padding: 10px;
-  color: var(--text-primary);
-  cursor: pointer;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-}
-
 .theme-toggle:hover {
   background-color: var(--bg-secondary);
 }
 
-/* Override any hover effects for the theme toggle icon */
+/* Override any hover effects for all nav icons */
+.nav-icons a:hover .nav-icon,
 .theme-toggle:hover .nav-icon {
   color: var(--text-primary);
 }
@@ -139,18 +133,15 @@ main {
 
 /* Specific styles for moon and sun icons */
 .theme-toggle .moon-icon {
-  color: #000000;
+  color: var(--text-primary);
 }
 
 .theme-toggle .sun-icon {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 /* Ensure colors don't change on hover */
-.theme-toggle:hover .moon-icon {
-  color: #000000;
-}
-
+.theme-toggle:hover .moon-icon,
 .theme-toggle:hover .sun-icon {
-  color: #ffffff;
+  color: var(--text-primary);
 }

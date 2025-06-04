@@ -5,7 +5,7 @@
   /* Start from the very left of the page */
   width: 100%;
   /* Full width */
-  height: 60px;
+  height: 70px;
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
   z-index: 110;
@@ -34,14 +34,15 @@
 }
 
 .topbar-logo {
-  width: 25px;
-  height: 25px;
+  width: 35px;
+  height: 35px;
   background: white;
-  border-radius: 4px;
+  border-radius: 6px;
+
 }
 
 .topbar-title {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
@@ -61,10 +62,6 @@
   padding: 6px 10px;
   border-radius: 20px;
   transition: background-color 0.2s;
-}
-
-.user-info:hover {
-  background-color: #f5f5f5;
 }
 
 .user-greeting {

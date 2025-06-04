@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaGoogle } from 'react-icons/fa';
 import { GoogleLogin } from '@react-oauth/google';
 import './Login.css';
+import logo from "/bruinwatch_logo.gif";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -175,8 +176,11 @@ const Login = () => {
   return (
     <div className="whole-container">
       <div className="auth-container">
-        <div className="brand-title">
-          BruinWatch
+        <div className="brand-section">
+          <img src={logo} alt="BruinWatch Logo" className="brand-logo" />
+          <div className="brand-title">
+            BruinWatch
+          </div>
         </div>
 
         <div className="auth-card">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TopBar.css';
-import logo from "/bruinwatch_logo.svg";
+import logo from "/bruinwatch_logo.gif";
 
 // Preset profile pictures
 const profilePictures = [

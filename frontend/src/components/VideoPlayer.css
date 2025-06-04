@@ -73,18 +73,6 @@
   border-bottom: 1px solid var(--accent-color);
 }
 
-.active-tabs::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 5px;
-  background: black;
-  border-radius: 2px;
-}
-
 .content-tabs {
   flex: 1;
   display: flex;
