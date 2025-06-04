@@ -2,6 +2,7 @@ import express from 'express';
 import connectDB from './db/mongo.js';
 import userRoute from './routes/userRoute.js';
 import chatbotRoute from './routes/chatbotRoute.js';
+import webscrapingRoute from './routes/webscraping.js';
 import passport from 'passport';
 import cors from 'cors';
 import http from 'http';
@@ -19,6 +20,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.get('/', (req, res) => res.send('Hello World!'));
 app.use('/users', userRoute);
 app.use('/chat', chatbotRoute);
+app.use('/webscraping', webscrapingRoute);
 
 // Create server with HTTP + WebSocket support
 const server = http.createServer(app);
