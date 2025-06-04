@@ -1,15 +1,15 @@
 .navbar {
   width: 80px;
   height: 100vh;
-  background: #fff;
-  color: #222;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   position: fixed;
   left: 0;
   top: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-right: none;
+  border-right: 1px solid var(--border-color);
   z-index: 95;
 }
 
@@ -58,37 +58,99 @@
   justify-content: center;
 }
 
-.nav-icons a {
+.nav-icons a,
+.theme-toggle {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-primary);
 }
 
 .nav-icon {
   font-size: 1.2rem;
-  color: #222;
+  color: var(--text-primary);
+  transition: color 0.2s ease;
 }
 
 .nav-icons a.active {
-  background: #3a3a3c;
+  background: var(--accent-color);
 }
 
 .nav-icons a.active .nav-icon,
 .nav-icons a:hover .nav-icon {
-  color: #fff;
+  color: white;
 }
 
 .nav-icons a:hover:not(.active) {
-  background: rgba(53, 55, 58, 0.1);
+  background: var(--accent-color);
 }
 
 main {
   margin-left: 80px;
   padding: 2rem;
-  background: #f7f7f7;
+  background: var(--bg-secondary);
   min-height: 100vh;
-} 
+}
+
+.theme-toggle-container {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  padding: 10px;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Override any hover effects for the theme toggle icon */
+.theme-toggle:hover .nav-icon {
+  color: var(--text-primary);
+}
+
+.theme-toggle .nav-icon {
+  font-size: 1.2rem;
+  transition: none;
+}
+
+/* Specific styles for moon and sun icons */
+.theme-toggle .moon-icon {
+  color: #000000;
+}
+
+.theme-toggle .sun-icon {
+  color: #ffffff;
+}
+
+/* Ensure colors don't change on hover */
+.theme-toggle:hover .moon-icon {
+  color: #000000;
+}
+
+.theme-toggle:hover .sun-icon {
+  color: #ffffff;
+}

@@ -22,7 +22,7 @@ const Login = () => {
       ...formData,
       [name]: value
     });
-    
+
     // Clear errors when user starts typing
     if (errors[name]) {
       setErrors({
@@ -34,29 +34,29 @@ const Login = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     if (!isLogin) {
       if (!formData.name.trim()) {
         newErrors.name = 'Name is required';
       }
-      
+
       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       }
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -64,11 +64,11 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     if (validateForm()) {
       try {
         const apiEndpoint = isLogin ? '/users/login' : '/users/register';
-        const payload = isLogin ? 
+        const payload = isLogin ?
           { email: formData.email, password: formData.password } :
           { name: formData.name, email: formData.email, password: formData.password };
 
@@ -81,15 +81,22 @@ const Login = () => {
         });
 
         const data = await response.json();
-        
+
         if (!response.ok) {
           throw new Error(data.message || 'Authentication failed');
         }
-        
-        // Save token to localStorage
+
+        // Save token and user data to localStorage
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
+        // Ensure we're storing all user data including profilePictureIndex
+        const userData = {
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          profilePictureIndex: data.user.profilePictureIndex || 1
+        };
+        localStorage.setItem('user', JSON.stringify(userData));
+
         setIsSubmitting(false);
         navigate('/dashboard');
       } catch (error) {
@@ -118,10 +125,19 @@ const Login = () => {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
+        // Save token and user data to localStorage
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        // Ensure we're storing all user data including profilePictureIndex
+        const userData = {
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          profilePictureIndex: data.user.profilePictureIndex || 1,
+          picture: data.user.picture
+        };
+        localStorage.setItem('user', JSON.stringify(userData));
         navigate('/dashboard');
       } else {
         setErrors({
@@ -162,114 +178,114 @@ const Login = () => {
         <div className="brand-title">
           BruinWatch
         </div>
-        
+
         <div className="auth-card">
           <form onSubmit={handleSubmit}>
-          {!isLogin && (
+            {!isLogin && (
+              <div className="form-field">
+                <label htmlFor="name">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="name"
+                />
+                {errors.name && <div className="error-message">{errors.name}</div>}
+              </div>
+            )}
+
+            {errors.general && (
+              <div className="error-text">
+                {errors.general}
+              </div>
+            )}
+
+            {errors.auth && (
+              <div className="error-text">
+                {errors.auth}
+              </div>
+            )}
+
             <div className="form-field">
-              <label htmlFor="name">Name</label>
+              <label htmlFor="email">Email</label>
               <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
-                placeholder="name"
+                placeholder="email"
               />
-              {errors.name && <div className="error-message">{errors.name}</div>}
+              {errors.email && (
+                <div className="error-text">
+                  {errors.email}
+                </div>
+              )}
             </div>
-          )}
-          
-          {errors.general && (
-            <div className="error-text">
-              {errors.general}
-            </div>
-          )}
-          
-          {errors.auth && (
-            <div className="error-text">
-              {errors.auth}
-            </div>
-          )}
-          
-          <div className="form-field">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="email"
-            />
-            {errors.email && (
-              <div className="error-text">
-                {errors.email}
-              </div>
-            )}
-          </div>
-          
-          <div className="form-field">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="password"
-            />
-            {errors.password && (
-              <div className="error-text">
-                {errors.password}
-              </div>
-            )}
-          </div>
-          
-          {!isLogin && (
+
             <div className="form-field">
-              <label htmlFor="confirmPassword">Confirm Password</label>
+              <label htmlFor="password">Password</label>
               <input
                 type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
+                id="password"
+                name="password"
+                value={formData.password}
                 onChange={handleChange}
-                placeholder="confirm password"
+                placeholder="password"
               />
-              {errors.confirmPassword && <div className="error-message">{errors.confirmPassword}</div>}
+              {errors.password && (
+                <div className="error-text">
+                  {errors.password}
+                </div>
+              )}
             </div>
-          )}
-          
-          <button 
-            type="submit" 
-            className="auth-button"
-            disabled={isSubmitting}
-          >
-            {isSubmitting 
-              ? (isLogin ? 'Logging in...' : 'Creating account...') 
-              : (isLogin ? 'Login' : 'Sign Up')}
-          </button>
-          
-          <div className="google-button-container">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              useOneTap
-              theme="outline"
-              text={isLogin ? "signin_with" : "signup_with"}
-              shape="rectangular"
-              size="large"
-            />
-          </div>
-          {errors.google && <div className="error-message">{errors.google}</div>}
-          
-          <div className="link-text">
-            {isLogin ? "Don't have an account? " : 'Already have an account? '}
-            <a href="#" onClick={(e) => {e.preventDefault(); toggleForm();}}>
-              {isLogin ? 'Sign up' : 'Sign in'}
-            </a>
-          </div>
+
+            {!isLogin && (
+              <div className="form-field">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="confirm password"
+                />
+                {errors.confirmPassword && <div className="error-message">{errors.confirmPassword}</div>}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="auth-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? (isLogin ? 'Logging in...' : 'Creating account...')
+                : (isLogin ? 'Login' : 'Sign Up')}
+            </button>
+
+            <div className="google-button-container">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap
+                theme="outline"
+                text={isLogin ? "signin_with" : "signup_with"}
+                shape="rectangular"
+                size="large"
+              />
+            </div>
+            {errors.google && <div className="error-message">{errors.google}</div>}
+
+            <div className="link-text">
+              {isLogin ? "Don't have an account? " : 'Already have an account? '}
+              <a href="#" onClick={(e) => { e.preventDefault(); toggleForm(); }}>
+                {isLogin ? 'Sign up' : 'Sign in'}
+              </a>
+            </div>
           </form>
         </div>
       </div>

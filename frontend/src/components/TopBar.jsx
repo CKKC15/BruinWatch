@@ -1,6 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TopBar.css';
+import logo from "/bruinwatch_logo.svg";
+
+// Preset profile pictures
+const profilePictures = [
+  '/profile-pics/avatar1.png',
+  '/profile-pics/avatar2.png',
+  '/profile-pics/avatar3.png',
+  '/profile-pics/avatar4.png',
+  '/profile-pics/avatar5.png',
+  '/profile-pics/avatar6.png',
+];
+
+const getProfilePicturePath = (index) => {
+  if (index >= 1 && index <= profilePictures.length) {
+    return profilePictures[index - 1];
+  }
+  return '/pfp.png'; // default picture
+};
 
 const TopBar = () => {
   const [user, setUser] = useState(null);
@@ -9,15 +27,24 @@ const TopBar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get user from localStorage
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
+    // Get user from localStorage and update on storage changes
+    const updateUserFromStorage = () => {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        try {
+          setUser(JSON.parse(userData));
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+        }
       }
-    }
+    };
+
+    updateUserFromStorage(); // Initial load
+    window.addEventListener('storage', updateUserFromStorage);
+
+    return () => {
+      window.removeEventListener('storage', updateUserFromStorage);
+    };
   }, []);
 
   useEffect(() => {
@@ -66,21 +93,23 @@ const TopBar = () => {
     <div className="topbar">
       <div className="topbar-content">
         <div className="topbar-logo-container">
-          <div className="topbar-logo" />
+          <div className="topbar-logo">
+            <img src={logo} alt="BruinWatch Logo" className="topbar-logo" />
+          </div>
           <h1 className="topbar-title">BruinWatch</h1>
         </div>
-        
+
         {user && (
           <div className="user-profile" ref={dropdownRef}>
             <div className="user-info" onClick={toggleDropdown}>
               <span className="user-greeting">Hi, {user.name}</span>
-              <img 
-                src="/pfp.png" 
-                alt="Profile" 
-                className="profile-picture" 
+              <img
+                src={getProfilePicturePath(user.profilePictureIndex)}
+                alt="Profile"
+                className="profile-picture"
               />
             </div>
-            
+
             {dropdownOpen && (
               <div className="dropdown-menu">
                 <button onClick={handleLogout} className="dropdown-item">

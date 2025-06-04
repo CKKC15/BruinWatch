@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaHome } from 'react-icons/fa';
-import { FaPlus } from 'react-icons/fa';
-import { FaInfoCircle } from 'react-icons/fa';
-import { FaUser } from 'react-icons/fa';
+import { FaHome, FaPlus, FaUser } from 'react-icons/fa';
+import { BsMoonFill, BsSunFill } from 'react-icons/bs';
+import { useTheme } from '../context/ThemeContext';
 import './Navbar.css';
 
 const Navbar = () => {
+  const { isDarkMode, toggleDarkMode } = useTheme();
+
   return (
     <nav className="navbar">
       <ul className="nav-icons">
@@ -21,16 +22,24 @@ const Navbar = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/info" className={({ isActive }) => isActive ? 'active' : ''}>
-            <FaInfoCircle className="nav-icon" />
-          </NavLink>
-        </li>
-        <li>
           <NavLink to="/profile" className={({ isActive }) => isActive ? 'active' : ''}>
             <FaUser className="nav-icon" />
           </NavLink>
         </li>
       </ul>
+      <div className="theme-toggle-container">
+        <button
+          onClick={toggleDarkMode}
+          className="theme-toggle"
+          aria-label="Toggle dark mode"
+        >
+          {isDarkMode ? (
+            <BsSunFill className="nav-icon sun-icon" />
+          ) : (
+            <BsMoonFill className="nav-icon moon-icon" />
+          )}
+        </button>
+      </div>
     </nav>
   );
 };

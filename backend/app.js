@@ -8,7 +8,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 
 const app = express();
-const port = 5000; // single port for both HTTP + WebSocket
+const port = 3000; // single port for both HTTP + WebSocket
 
 // middleware
 app.use(express.json());
@@ -39,29 +39,35 @@ io.on('connection', (socket) => {
   socket.on('create-room', (callback) => {
     const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     const roomId = `room_${roomCode}`;
-    
+
     activeRooms.set(roomCode, {
       id: roomId,
       creator: socket.id,
       created: new Date(),
       members: []
     });
-    
+
     socket.join(roomId);
     activeRooms.get(roomCode).members.push(socket.id);
-    
+
     console.log(`Room created: ${roomCode} by ${socket.id}`);
     callback({ success: true, roomCode, roomId });
   });
 
   // Join existing room
-  socket.on('join-room', (roomCode, callback) => {
+  socket.on('join-room', (roomCode, userData, callback) => {
     if (activeRooms.has(roomCode)) {
       const room = activeRooms.get(roomCode);
       socket.join(room.id);
       room.members.push(socket.id);
-      
-      socket.to(room.id).emit('user-joined', `Someone joined the room`);
+
+      socket.to(room.id).emit('user-joined', {
+        message: `${userData.username} joined the room`,
+        sender: userData.username,
+        profilePictureIndex: userData.profilePictureIndex,
+        timestamp: Date.now(),
+        isSystem: true
+      });
       console.log(`Socket ${socket.id} joined room ${roomCode}`);
       callback({ success: true, roomId: room.id });
     } else {
@@ -69,9 +75,14 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('send-message', ({ room, message, sender }) => {
+  socket.on('send-message', ({ room, message, sender, profilePictureIndex }) => {
     console.log(`Message from ${sender} in room ${room}: ${message}`);
-    socket.to(room).emit('receive-message', { message, sender, timestamp: Date.now() });
+    socket.to(room).emit('receive-message', {
+      message,
+      sender,
+      timestamp: Date.now(),
+      profilePictureIndex
+    });
   });
 
   socket.on('disconnect', () => {

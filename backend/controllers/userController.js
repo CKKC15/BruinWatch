@@ -43,7 +43,12 @@ export const register = async (req, res) => {
       expiresIn: "30d",
     });
     res.status(201).json({
-      user: { id: user._id, name: user.name, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        profilePictureIndex: user.profilePictureIndex
+      },
       token,
     });
   } catch (err) {
@@ -63,7 +68,12 @@ export const login = async (req, res) => {
       expiresIn: "30d",
     });
     res.json({
-      user: { id: user._id, name: user.name, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        profilePictureIndex: user.profilePictureIndex
+      },
       token,
     });
   } catch (err) {
@@ -115,6 +125,7 @@ export const verifyGoogle = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        profilePictureIndex: user.profilePictureIndex,
         picture: user.picture || payload.picture,
       },
     });
@@ -128,14 +139,22 @@ export const verifyGoogle = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password } = req.body;
+    const { name, email, password, profilePictureIndex } = req.body;
     const updates = {};
     if (name) updates.name = name;
     if (email) updates.email = email;
     if (password) updates.password = await bcrypt.hash(password, 12);
+    if (profilePictureIndex) updates.profilePictureIndex = profilePictureIndex;
+
     const user = await User.findByIdAndUpdate(id, updates, { new: true });
     if (!user) return res.status(404).json({ message: "User not found" });
-    res.json({ id: user._id, name: user.name, email: user.email });
+
+    res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      profilePictureIndex: user.profilePictureIndex
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -206,10 +225,10 @@ export const findKeywordInVideo = async (req, res) => {
 // create a new video and link to user and class
 export const createVideo = async (req, res) => {
   try {
-    const { title, className, date } = req.body;
+    const { title, className, date, youtubeUrl } = req.body;
     const { id: userId } = req.params;
 
-    if (!title || !req.file) {
+    if (!title || (!req.file && !youtubeUrl)) {
       return res.status(400).json({ message: "Missing fields" });
     }
 
@@ -219,32 +238,41 @@ export const createVideo = async (req, res) => {
       return res.status(404).json({ message: "Class not found " + className });
     }
 
-    // 2. Upload video to S3
-    const s3Url = await uploadFileToS3(req.file, "videos");
+    let videoUrl;
+    let transcript;
+    let embeddings;
 
-    // 3. Transcribe the video
-    const transcript = await transcribeMedia(req.file.buffer);
+    if (youtubeUrl) {
+      // Handle YouTube URL
+      videoUrl = youtubeUrl;
+      // For YouTube videos, we'll set a placeholder transcript
+      transcript = { fullText: "YouTube video - transcript not available", segments: [] };
+      embeddings = [];
+    } else {
+      // Handle file upload
+      videoUrl = await uploadFileToS3(req.file, "videos");
+      transcript = await transcribeMedia(req.file.buffer);
+      embeddings = await createEmbeddings(transcript.segments);
+    }
 
-    // 4. Generate embeddings
-    const embeddings = await createEmbeddings(transcript.segments);
-
-    // 5. Create video record with transcript
+    // Create video record with transcript
     const video = await createVideoRecord({
       title,
-      link: s3Url,
+      link: videoUrl,
       transcript,
       embeddings,
       userId,
       className,
       date,
+      isYoutubeVideo: !!youtubeUrl
     });
 
-    // 6. Link video to user
+    // Link video to user
     await User.findByIdAndUpdate(userId, {
       $push: { videos: video._id },
     });
 
-    // 7. Link video to class
+    // Link video to class
     await Class.findByIdAndUpdate(classRecord._id, {
       $push: { videos: video._id },
     });
@@ -260,13 +288,13 @@ export const createVideo = async (req, res) => {
 export const getVideoById = async (req, res) => {
   try {
     const { videoId } = req.params;
-    
+
     // Simply find the video by ID, no user ownership check
     const video = await Video.findById(videoId);
     if (!video) {
       return res.status(404).json({ message: "Video not found" });
     }
-    
+
     res.json(video);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -304,13 +332,13 @@ export const getAllClasses = async (req, res) => {
   try {
     const { id: userId } = req.params;
     const { all } = req.query; // Check for 'all' query parameter
-    
+
     if (all === 'true') {
       // Return all classes in the system
       const allClasses = await Class.find({});
       return res.json(allClasses);
     }
-    
+
     // Return user's classes (existing behavior)
     const user = await User.findById(userId).populate('classes');
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -414,13 +442,13 @@ export const getAllClassNames = async (req, res) => {
 export const getAllVideosForClass = async (req, res) => {
   try {
     const { classId } = req.params;
-    
+
     // Find the class and populate with full video details
     const classData = await Class.findById(classId).populate('videos');
     if (!classData) {
       return res.status(404).json({ message: "Class not found" });
     }
-    
+
     // Return the full video objects
     res.json(classData.videos);
   } catch (err) {
@@ -432,37 +460,37 @@ export const getAllVideosForClass = async (req, res) => {
 export const joinClass = async (req, res) => {
   try {
     const { id: userId, classId } = req.params;
-    
+
     // Check if user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     // Check if class exists
     const classExists = await Class.findById(classId);
     if (!classExists) {
       return res.status(404).json({ message: "Class not found" });
     }
-    
+
     // Check if user is already in this class
     const isAlreadyJoined = user.classes.some(cls => cls.toString() === classId);
     if (isAlreadyJoined) {
       return res.status(400).json({ message: "Already joined this class" });
     }
-    
+
     // Add class to user's classes
     await User.findByIdAndUpdate(
-      userId, 
+      userId,
       { $push: { classes: classId } },
       { new: true }
     );
-    
-    res.status(200).json({ 
-      message: "Successfully joined class", 
-      class: classExists 
+
+    res.status(200).json({
+      message: "Successfully joined class",
+      class: classExists
     });
-    
+
   } catch (err) {
     console.error("Join class error:", err);
     res.status(500).json({ message: "Internal server error: " + err.message });

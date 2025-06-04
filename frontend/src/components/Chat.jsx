@@ -2,6 +2,23 @@ import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import './Chat.css';
 
+// Preset profile pictures
+const profilePictures = [
+  '/profile-pics/avatar1.png',
+  '/profile-pics/avatar2.png',
+  '/profile-pics/avatar3.png',
+  '/profile-pics/avatar4.png',
+  '/profile-pics/avatar5.png',
+  '/profile-pics/avatar6.png',
+];
+
+const getProfilePicturePath = (index) => {
+  if (index >= 1 && index <= profilePictures.length) {
+    return profilePictures[index - 1];
+  }
+  return '/pfp.png'; // default picture
+};
+
 const Chat = () => {
   const [socket, setSocket] = useState(null);
   const [currentRoom, setCurrentRoom] = useState(null);
@@ -11,6 +28,7 @@ const Chat = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [username, setUsername] = useState('');
   const [showUsernameInput, setShowUsernameInput] = useState(false);
+  const [userProfilePicIndex, setUserProfilePicIndex] = useState(1);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -18,6 +36,7 @@ const Chat = () => {
     if (userData) {
       const user = JSON.parse(userData);
       setUsername(user.name || user.email.split('@')[0]);
+      setUserProfilePicIndex(user.profilePictureIndex || 1);
       setShowUsernameInput(false);
     } else {
       setShowUsernameInput(true);
@@ -31,15 +50,18 @@ const Chat = () => {
         message: data.message,
         sender: data.sender,
         timestamp: data.timestamp,
-        isOwn: false
+        isOwn: false,
+        profilePictureIndex: data.profilePictureIndex
       }]);
     });
 
-    newSocket.on('user-joined', (message) => {
+    newSocket.on('user-joined', (data) => {
       setMessages(prev => [...prev, {
-        message,
+        message: data.message,
+        sender: data.sender,
+        timestamp: data.timestamp,
         isSystem: true,
-        timestamp: Date.now()
+        profilePictureIndex: data.profilePictureIndex
       }]);
     });
 
@@ -52,7 +74,7 @@ const Chat = () => {
 
   const createRoom = () => {
     if (!socket || !username.trim()) return;
-    
+
     socket.emit('create-room', (response) => {
       if (response.success) {
         setCurrentRoom(response.roomId);
@@ -64,8 +86,11 @@ const Chat = () => {
 
   const joinRoom = () => {
     if (!socket || !joinCode.trim() || !username.trim()) return;
-    
-    socket.emit('join-room', joinCode.toUpperCase(), (response) => {
+
+    socket.emit('join-room', joinCode.toUpperCase(), {
+      username,
+      profilePictureIndex: userProfilePicIndex
+    }, (response) => {
       if (response.success) {
         setCurrentRoom(response.roomId);
         setRoomCode(joinCode.toUpperCase());
@@ -82,16 +107,19 @@ const Chat = () => {
     const messageData = {
       room: currentRoom,
       message: inputMessage,
-      sender: username
+      sender: username,
+      profilePictureIndex: userProfilePicIndex,
+      timestamp: Date.now()
     };
 
     socket.emit('send-message', messageData);
-    
+
     setMessages(prev => [...prev, {
       message: inputMessage,
       sender: username,
       timestamp: Date.now(),
-      isOwn: true
+      isOwn: true,
+      profilePictureIndex: userProfilePicIndex
     }]);
 
     setInputMessage('');
@@ -135,7 +163,7 @@ const Chat = () => {
       <div className="chat-container">
         <div className="room-setup">
           <h3>Live Chat</h3>
-          
+
           <div className="room-actions">
             <div className="create-room-section">
               <button onClick={createRoom} className="create-room-btn">
@@ -165,7 +193,7 @@ const Chat = () => {
     <div className="chat-container">
       <div className="chat-header">
         <h4>Room: {roomCode}</h4>
-        <button 
+        <button
           onClick={() => {
             setCurrentRoom(null);
             setRoomCode('');
@@ -177,21 +205,21 @@ const Chat = () => {
         </button>
       </div>
 
-      <div className="chat-messages">
+      <div className="messages-container">
         {messages.map((msg, index) => (
-          <div 
-            key={index} 
-            className={`message ${msg.isOwn ? 'own' : msg.isSystem ? 'system' : 'other'}`}
-          >
-            {!msg.isSystem && (
-              <div className="message-header">
-                <span className="sender">{msg.sender}</span>
-                <span className="timestamp">
-                  {new Date(msg.timestamp).toLocaleTimeString()}
-                </span>
+          <div key={index} className={`message ${msg.isOwn ? 'own' : msg.isSystem ? 'system' : 'other'}`}>
+            <img
+              src={getProfilePicturePath(msg.profilePictureIndex)}
+              alt="Profile"
+              className="chat-profile-picture"
+            />
+            <div className="message-content">
+              <div className="message-sender">{msg.sender}</div>
+              <div className="message-text">{msg.message}</div>
+              <div className="message-timestamp">
+                {new Date(msg.timestamp).toLocaleTimeString()}
               </div>
-            )}
-            <div className="message-content">{msg.message}</div>
+            </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
@@ -207,7 +235,7 @@ const Chat = () => {
             className="chat-input"
             rows="1"
           />
-          <button 
+          <button
             onClick={sendMessage}
             className="send-button-inside"
             disabled={!inputMessage.trim()}

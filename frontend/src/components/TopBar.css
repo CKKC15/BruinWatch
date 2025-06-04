@@ -1,12 +1,15 @@
 .topbar {
   position: fixed;
   top: 0;
-  left: 0; /* Start from the very left of the page */
-  width: 100%; /* Full width */
+  left: 0;
+  /* Start from the very left of the page */
+  width: 100%;
+  /* Full width */
   height: 60px;
-  background-color: #fff;
-  border-bottom: none;
-  z-index: 110; /* Increased z-index to be higher than navbar */
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 110;
+  /* Increased z-index to be higher than navbar */
 }
 
 .topbar-content {
@@ -15,29 +18,32 @@
   justify-content: space-between;
   height: 100%;
   padding: 0;
-  padding-left: 20px; /* Add padding to the left */
-  margin-left: 0; /* No margin */
+  padding-left: 30px;
+  /* Add padding to the left */
+  margin-left: 0;
+  /* No margin */
 }
 
 .topbar-logo-container {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 30px;
   position: relative;
-  z-index: 111; /* Even higher z-index for the logo container */
+  z-index: 111;
+  /* Even higher z-index for the logo container */
 }
 
 .topbar-logo {
-  width: 22px;
-  height: 22px;
-  background: #222;
+  width: 25px;
+  height: 25px;
+  background: white;
   border-radius: 4px;
 }
 
 .topbar-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #222;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -64,7 +70,7 @@
 .user-greeting {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .profile-picture {
@@ -80,13 +86,14 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: white;
+  background: var(--bg-primary);
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   width: 150px;
   z-index: 1000;
   margin-top: 8px;
   overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
 .dropdown-item {
@@ -98,11 +105,23 @@
   border: none;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #333;
+  color: var(--text-primary);
   transition: background-color 0.2s;
 }
 
 .dropdown-item:hover {
-  background-color: #f5f5f5;
-  color: #4285f4;
-} 
+  background-color: var(--bg-secondary);
+}
+
+.user-button {
+  color: var(--text-primary);
+}
+
+.user-button:hover {
+  background-color: var(--bg-secondary);
+}
+
+.user-menu-dropdown {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+}

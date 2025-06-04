@@ -1,5 +1,8 @@
 .class-page-container {
   padding: 20px;
+  background-color: var(--bg-secondary);
+  scale: 1.025;
+  height: 105%;
 }
 
 .class-page-header {
@@ -8,14 +11,14 @@
 
 .class-page-header h1 {
   font-size: 24px;
-  color: #333;
+  color: var(--text-primary);
   margin: 0 0 10px 0;
 }
 
 .class-details {
   display: flex;
   gap: 20px;
-  color: #666;
+  color: var(--text-primary);
   font-size: 14px;
 }
 
@@ -31,7 +34,7 @@
 }
 
 .video-card {
-  background-color: white;
+  background-color: var(--bg-primary);
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
@@ -40,11 +43,12 @@
   display: flex;
   flex-direction: column;
   height: 300px;
+  border: 1px solid var(--border-color);
 }
 
 .video-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px var(--shadow-color);
 }
 
 .video-card-content {
@@ -57,7 +61,7 @@
 
 .video-card h3 {
   margin: 0 0 10px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 16px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -68,7 +72,7 @@
 
 .video-card p {
   margin: 0;
-  color: #666;
+  color: var(--text-primary);
   font-size: 14px;
 }
 
@@ -138,6 +142,7 @@
 
 .matched-segments {
   margin-top: 8px;
+  color: var(--text-primary);
 }
 
 .matched-segments ul {
@@ -150,8 +155,9 @@
 .timestamp-button {
   background: none;
   border: none;
-  vertical-align: top; /* aligns with top of line box */
-  color: #007bff;
+  vertical-align: top;
+  /* aligns with top of line box */
+  color: var(--accent-color);
   cursor: pointer;
   padding: 0;
   font-size: 14px;
@@ -159,6 +165,24 @@
 }
 
 .timestamp-button:hover {
+  color: #3367d6;
   text-decoration: underline;
 }
 
+.class-page {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.class-header {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.class-info h1 {
+  color: var(--text-primary);
+}
+
+.class-info span {
+  color: var(--text-primary);
+}

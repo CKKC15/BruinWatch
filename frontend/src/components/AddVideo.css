@@ -6,7 +6,8 @@
   display: flex;
   flex-direction: column;
   min-height: 80vh;
-  background-color: #f5f5f5;
+  background-color: var(--bg-secondary);
+  scale: 1.05;
 }
 
 .add-video-content {
@@ -17,11 +18,11 @@
   gap: 20px;
 }
 
-.upload-section, 
+.upload-section,
 .form-section {
   flex: 1;
   width: 50%;
-  background-color: #fff;
+  background-color: var(--bg-primary);
   box-sizing: border-box;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -42,7 +43,8 @@
   justify-content: center;
 }
 
-.upload-section, .form-section {
+.upload-section,
+.form-section {
   display: flex;
   flex-direction: column;
 }
@@ -51,24 +53,24 @@
   .add-video-content {
     flex-direction: column;
   }
-  
-  .upload-section, 
+
+  .upload-section,
   .form-section {
     width: 100%;
     margin-bottom: 20px;
   }
-  
+
   .upload-section {
     padding: 20px;
     min-height: 300px;
   }
-  
+
   .form-section {
     padding: 20px;
   }
 }
 
-.upload-section h2, 
+.upload-section h2,
 .form-section h2 {
   margin-top: 0;
   margin-bottom: 15px;
@@ -78,7 +80,7 @@
   padding-top: 20px;
 }
 
-.upload-section p, 
+.upload-section p,
 .form-section p {
   color: #666;
   margin-bottom: 20px;
@@ -251,6 +253,10 @@
   height: 100%;
 }
 
+.file-upload-section h2 {
+  color: var(--text-primary);
+}
+
 .dropzone {
   border: 2px dashed #ccc;
   border-radius: 8px;
@@ -361,6 +367,10 @@
   height: 100%;
 }
 
+.youtube-section h2 {
+  color: var(--text-primary);
+}
+
 .youtube-input-container {
   border: 2px dashed #ccc;
   border-radius: 8px;
@@ -458,7 +468,7 @@
   padding-bottom: 0;
 }
 
-.inline-video-preview iframe, 
+.inline-video-preview iframe,
 .inline-video-preview video {
   width: 100%;
   aspect-ratio: 16/9;
@@ -515,4 +525,38 @@
 .youtube-instructions li {
   margin-bottom: 8px;
   color: #555;
+}
+
+.add-video-form {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.add-video-form h2 {
+  color: var(--text-primary);
+}
+
+.add-video-form label {
+  color: var(--text-primary);
+}
+
+.add-video-form input,
+.add-video-form select {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.add-video-form button {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.add-video-form button:hover {
+  background-color: #3367d6;
+}
+
+.add-video-form p {
+  color: var(--text-primary);
 }

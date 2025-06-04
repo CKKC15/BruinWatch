@@ -19,8 +19,10 @@ body {
 }
 
 main {
-  margin-left: 80px; /* Same width as navbar */
-  margin-top: 60px; /* Same height as topbar */
+  margin-left: 80px;
+  /* Same width as navbar */
+  margin-top: 60px;
+  /* Same height as topbar */
   width: calc(100% - 80px);
   min-height: calc(100vh - 60px);
   background-color: #f7f7f7;
@@ -33,9 +35,11 @@ main {
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -44,6 +48,7 @@ main {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

@@ -25,20 +25,21 @@ const verifyGoogleToken = async (token) => {
 const findOrCreateGoogleUser = async (profile) => {
   // Check if user already exists by email
   let user = await User.findOne({ email: profile.email });
-  
+
   if (user) {
     return user;
   }
-  
+
   // Create new user
   user = await User.create({
     name: profile.name,
     email: profile.email,
-      googleId: profile.sub,
-      picture: profile.picture
-    });
-    
-    return user;
+    googleId: profile.sub,
+    picture: profile.picture,
+    profilePictureIndex: 1  // Set default profile picture index
+  });
+
+  return user;
 };
 
 export { verifyGoogleToken, findOrCreateGoogleUser };

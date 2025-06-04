@@ -1,10 +1,15 @@
 .dashboard-container {
   padding: 40px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  height: 100%;
+  scale: 1.05;
 }
 
 .dashboard-title {
   font-size: 2rem;
   margin-bottom: 20px;
+  color: var(--text-primary);
 }
 
 .dashboard-grid {
@@ -21,12 +26,15 @@
   justify-content: flex-end;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
 }
 
 .dashboard-card:hover {
   transform: translateY(-3px);
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .card-buttons {
@@ -37,24 +45,33 @@
   display: flex;
   justify-content: space-between;
   padding: 0 8px;
-  color: black;
+  color: var(--text-primary);
 }
 
 .card-label {
-  background-color: white;
+  background-color: var(--bg-secondary);
   padding: 10px;
   font-weight: bold;
 }
 
+.card-label p {
+  color: var(--text-primary);
+}
+
 .add-card {
   background-color: rgba(0, 0, 0, 0.05);
-  border: 2px dashed #aaa;
-  color: #555;
+  border: 2px dashed var(--border-color);
+  color: var(--text-primary);
   align-items: center;
   justify-content: center;
   font-weight: 600;
   display: flex;
   cursor: pointer;
+}
+
+.add-card:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
 }
 
 .modal {
@@ -71,21 +88,34 @@
 }
 
 .modal-content {
-  background: white;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   padding: 24px;
   border-radius: 12px;
   width: 320px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  border: 1px solid var(--border-color);
 }
 
-.modal-content input[type="text"],
+.modal-content h2 {
+  color: var(--text-primary);
+}
+
+
+
 .modal-content input[type="color"] {
   padding: 8px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   font-size: 14px;
+}
+
+.modal-content input {
+  background-color: var(--bg-secondary);
+  color: black;
+  border: 1px solid var(--border-color);
 }
 
 .modal-buttons {
@@ -104,6 +134,7 @@
   font-weight: 500;
   transition: background-color 0.2s;
   flex: 1;
+  color: white;
 }
 
 .cancel-button {
